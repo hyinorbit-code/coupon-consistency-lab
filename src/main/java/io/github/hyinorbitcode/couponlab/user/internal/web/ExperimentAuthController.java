@@ -1,6 +1,10 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.web;
 
 import io.github.hyinorbitcode.couponlab.user.Role;
+import io.github.hyinorbitcode.couponlab.user.internal.application.UserService;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.AuthProvider;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
+import io.github.hyinorbitcode.couponlab.user.internal.security.JwtTokenIssuer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

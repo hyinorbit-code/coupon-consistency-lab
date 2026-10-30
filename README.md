@@ -43,6 +43,7 @@
 - [ADR-0005 개발 환경](docs/decisions/ADR-0005-dev-environment.md): 맥북 개발, Windows 노트북 전체 스택 실험·부하 생성, AWS 측정 (채택)
 - [ADR-0006 1단계 스키마](docs/decisions/ADR-0006-schema-v1.md): 코드 테이블로 당첨 표현, 불변식의 DB 제약, 코드 암호화·해시 분리, 코드 등록은 오픈 전만 (채택)
 - [ADR-0007 인증](docs/decisions/ADR-0007-authentication.md): 무상태 JWT, 실험용 토큰 발급(experiment 프로필), 동시 첫 로그인 처리 (채택)
+- [ADR-0008 패키지 구조](docs/decisions/ADR-0008-package-structure.md): 모듈은 기능 단위, 모듈 안은 web·application·domain 역할 단위 (채택)
 
 ## 실행 방법
 

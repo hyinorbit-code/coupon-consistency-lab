@@ -1,4 +1,4 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.time.Clock;

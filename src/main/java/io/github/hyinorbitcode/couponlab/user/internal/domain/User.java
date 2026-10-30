@@ -1,4 +1,4 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.domain;
 
 import io.github.hyinorbitcode.couponlab.user.Role;
 import jakarta.persistence.Entity;
@@ -13,10 +13,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-class User {
+public class User {
 
-    static final int MAX_PROVIDER_USER_ID_LENGTH = 64;
-    static final int MAX_NICKNAME_LENGTH = 50;
+    public static final int MAX_PROVIDER_USER_ID_LENGTH = 64;
+    public static final int MAX_NICKNAME_LENGTH = 50;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +45,8 @@ class User {
         this.createdAt = createdAt;
     }
 
-    static User create(AuthProvider authProvider, String providerUserId, String nickname, Role role, Instant now) {
+    public static User create(AuthProvider authProvider, String providerUserId, String nickname, Role role,
+            Instant now) {
         Objects.requireNonNull(authProvider, "authProvider");
         Objects.requireNonNull(role, "role");
         Objects.requireNonNull(now, "now");
@@ -63,15 +64,15 @@ class User {
         }
     }
 
-    Long getId() {
+    public Long getId() {
         return id;
     }
 
-    String getNickname() {
+    public String getNickname() {
         return nickname;
     }
 
-    Role getRole() {
+    public Role getRole() {
         return role;
     }
 }

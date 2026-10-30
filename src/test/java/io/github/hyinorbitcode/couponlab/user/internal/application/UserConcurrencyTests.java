@@ -1,10 +1,11 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.hyinorbitcode.couponlab.DatabaseCleaner;
 import io.github.hyinorbitcode.couponlab.IntegrationTest;
 import io.github.hyinorbitcode.couponlab.user.Role;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.AuthProvider;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

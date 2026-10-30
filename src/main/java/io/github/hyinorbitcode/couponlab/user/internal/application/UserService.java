@@ -1,12 +1,15 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.application;
 
 import io.github.hyinorbitcode.couponlab.user.Role;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.AuthProvider;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.UserRepository;
 import java.time.Clock;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
-class UserService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final Clock clock;
@@ -24,9 +27,13 @@ class UserService {
      * 막힌 쪽은 먼저 커밋된 사용자를 다시 조회해 반환한다. 실패한 INSERT의 트랜잭션은 이미 롤백되므로
      * 재조회는 새 트랜잭션에서 실행되도록 이 메서드 전체를 트랜잭션으로 묶지 않는다.
      */
-    User findOrCreate(AuthProvider authProvider, String providerUserId, String nickname, Role role) {
+    public User findOrCreate(AuthProvider authProvider, String providerUserId, String nickname, Role role) {
         return userRepository.findByAuthProviderAndProviderUserId(authProvider, providerUserId)
                 .orElseGet(() -> create(authProvider, providerUserId, nickname, role));
+    }
+
+    public User get(long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private User create(AuthProvider authProvider, String providerUserId, String nickname, Role role) {

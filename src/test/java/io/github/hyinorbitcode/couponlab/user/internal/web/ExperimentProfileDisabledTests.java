@@ -1,4 +1,4 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

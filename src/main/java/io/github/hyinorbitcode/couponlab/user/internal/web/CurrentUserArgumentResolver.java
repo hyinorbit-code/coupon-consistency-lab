@@ -1,9 +1,8 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.web;
 
 import io.github.hyinorbitcode.couponlab.user.CurrentUser;
 import io.github.hyinorbitcode.couponlab.user.Role;
-import java.util.List;
-import org.springframework.context.annotation.Configuration;
+import io.github.hyinorbitcode.couponlab.user.internal.security.JwtTokenIssuer;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -13,18 +12,12 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 컨트롤러 메서드의 {@link CurrentUser} 파라미터를 JWT의 sub(사용자 ID)·role 클레임으로 채운다.
+ * 등록은 {@link UserWebMvcConfig}에서 한다.
  */
-@Configuration(proxyBeanMethods = false)
-class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver, WebMvcConfigurer {
-
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(this);
-    }
+class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

@@ -1,5 +1,6 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.security;
 
+import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
 import java.time.Clock;
 import java.time.Instant;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -10,9 +11,9 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-class JwtTokenIssuer {
+public class JwtTokenIssuer {
 
-    static final String ROLE_CLAIM = "role";
+    public static final String ROLE_CLAIM = "role";
 
     private final JwtEncoder jwtEncoder;
     private final AuthProperties authProperties;
@@ -24,7 +25,7 @@ class JwtTokenIssuer {
         this.clock = clock;
     }
 
-    IssuedToken issue(User user) {
+    public IssuedToken issue(User user) {
         Instant now = clock.instant();
         Instant expiresAt = now.plus(authProperties.tokenTtl());
         JwtClaimsSet claims = JwtClaimsSet.builder()
@@ -39,6 +40,6 @@ class JwtTokenIssuer {
         return new IssuedToken(token, expiresAt);
     }
 
-    record IssuedToken(String accessToken, Instant expiresAt) {
+    public record IssuedToken(String accessToken, Instant expiresAt) {
     }
 }

@@ -1,4 +1,4 @@
-package io.github.hyinorbitcode.couponlab.user.internal;
+package io.github.hyinorbitcode.couponlab.user.internal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import io.github.hyinorbitcode.couponlab.DatabaseCleaner;
 import io.github.hyinorbitcode.couponlab.IntegrationTest;
+import io.github.hyinorbitcode.couponlab.user.internal.security.AuthProperties;
+import io.github.hyinorbitcode.couponlab.user.internal.security.JwtTokenIssuer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
