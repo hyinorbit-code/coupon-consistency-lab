@@ -1,6 +1,6 @@
 package io.github.hyinorbitcode.couponlab;
 
-import io.github.hyinorbitcode.couponlab.user.internal.application.VerificationMailSender;
+import io.github.hyinorbitcode.couponlab.user.mail.VerificationMailSender;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 

@@ -1,0 +1,90 @@
+package io.github.hyinorbitcode.couponlab.user.security;
+
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import io.github.hyinorbitcode.couponlab.global.security.SecurityProblemHandlers;
+import java.time.Clock;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * 무상태 JWT 인증(ADR-0007). 쿠키·세션을 쓰지 않으므로 CSRF 보호는 끈다.
+ * 401·403 응답은 공통 ProblemDetail 형식으로 쓴다(ADR-0013).
+ */
+@Configuration(proxyBeanMethods = false)
+class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter,
+            SecurityProblemHandlers problemHandlers) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/experiment/**", "/api/auth/**", "/actuator/health", "/error").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(problemHandlers.authenticationEntryPoint())
+                        .accessDeniedHandler(problemHandlers.accessDeniedHandler()))
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .authenticationEntryPoint(problemHandlers.authenticationEntryPoint())
+                        .accessDeniedHandler(problemHandlers.accessDeniedHandler())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        return http.build();
+    }
+
+    /** 기본은 BCrypt. 해시에 {bcrypt} 접두사가 붙어 나중에 알고리즘을 바꿔도 기존 해시를 검증할 수 있다. */
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(AuthProperties authProperties) {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey(authProperties)));
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder(AuthProperties authProperties, Clock clock) {
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey(authProperties))
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+        JwtTimestampValidator timestampValidator = new JwtTimestampValidator();
+        timestampValidator.setClock(clock);
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                timestampValidator, new JwtIssuerValidator(authProperties.issuer())));
+        return decoder;
+    }
+
+    /** role 클레임(ADMIN, USER)을 ROLE_ADMIN, ROLE_USER 권한으로 바꾼다. */
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthoritiesClaimName(JwtTokenIssuer.ROLE_CLAIM);
+        authoritiesConverter.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return converter;
+    }
+
+    private static SecretKey secretKey(AuthProperties authProperties) {
+        return new SecretKeySpec(authProperties.jwtSecretBytes(), "HmacSHA256");
+    }
+}

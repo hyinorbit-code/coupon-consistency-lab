@@ -43,10 +43,11 @@
 - [ADR-0005 개발 환경](docs/decisions/ADR-0005-dev-environment.md): 맥북 개발, Windows 노트북 전체 스택 실험·부하 생성, AWS 측정 (채택)
 - [ADR-0006 1단계 스키마](docs/decisions/ADR-0006-schema-v1.md): 코드 테이블로 당첨 표현, 불변식의 DB 제약, 코드 암호화·해시 분리, 코드 등록은 오픈 전만 (채택)
 - [ADR-0007 인증](docs/decisions/ADR-0007-authentication.md): 무상태 JWT, 실험용 토큰 발급(experiment 프로필), 동시 첫 로그인 처리 (채택)
-- [ADR-0008 패키지 구조](docs/decisions/ADR-0008-package-structure.md): 모듈은 기능 단위, 모듈 안은 web·application·domain 역할 단위 (채택)
+- [ADR-0008 패키지 구조](docs/decisions/ADR-0008-package-structure.md): 모듈은 기능 단위, 모듈 안은 web·application·domain 역할 단위 (대체됨 → ADR-0014)
 - [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
 - [ADR-0010 로그인 수단과 응모 자격](docs/decisions/ADR-0010-login-methods-and-eligibility.md): 이메일(인증)·카카오 로그인, 응모는 카카오 연동 사용자만 (채택)
 - [ADR-0011 프론트엔드](docs/decisions/ADR-0011-frontend.md): React 정적 SPA를 S3 + CloudFront로 배포, 같은 도메인에서 `/api/*`만 백엔드로 (채택)
+- [ADR-0014 패키지 구조](docs/decisions/ADR-0014-package-structure-korean-convention.md): 도메인 모듈 안은 controller·service·repository·entity·dto·exception·config, 공통은 global (채택)
 - [ADR-0013 오류 응답 규칙](docs/decisions/ADR-0013-error-responses.md): 모든 오류를 ProblemDetail + code로, 모듈별 ErrorCode, 전역 핸들러, 401·403 통일 (채택)
 - [프론트엔드 API 계약](docs/api/FRONTEND_API_CONTRACT.md): 화면이 기대하는 요청·응답, 오류 코드, 엔드포인트별 구현·목업 상태
 - [ADR-0012 이메일 회원가입과 인증](docs/decisions/ADR-0012-email-signup-and-verification.md): 계정 존재 비노출, 토큰 해시 저장, POST 인증, 커밋 후 메일 발송 (채택)

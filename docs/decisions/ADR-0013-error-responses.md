@@ -2,6 +2,7 @@
 
 작성일: 2026-10-30
 상태: 채택
+변경: 2026-10-30 `common` 모듈은 `global`로 이름과 위치가 바뀜(ADR-0014). `global.error`에 ErrorCode·BusinessException·GlobalExceptionHandler, `global.security`에 SecurityProblemHandlers
 
 ## 맥락
 

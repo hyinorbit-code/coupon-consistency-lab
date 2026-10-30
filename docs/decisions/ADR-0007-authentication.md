@@ -2,6 +2,7 @@
 
 작성일: 2026-10-30
 상태: 채택
+변경: 2026-10-30 패키지 위치는 ADR-0014를 따름(`user.internal.*` → `user.{controller, service, security, ...}`). 모듈 경계 원칙은 같음
 
 ## 맥락
 
