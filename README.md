@@ -22,9 +22,10 @@
 
 ## 기술 방향
 
-- 시작: Java, Spring Boot, Spring Data JPA, 관계형 DB, 테스트 자동화, 컨테이너 기반 배포
-- 단계 도입: Redis, Kafka, Outbox, (선택) Gateway·Resilience4j·분산 추적
-- 구체적인 버전과 도구는 0단계에서 결정합니다.
+- 시작: Java 25, Spring Boot 4.1, Spring Data JPA, Spring Modulith, MySQL 8.4, Flyway, JUnit 5·Testcontainers, Docker Compose
+- 배포: GitHub Actions, Amazon ECR, EC2
+- 단계 도입: k6, Redis, Kafka, Outbox, (선택) Gateway·Resilience4j·분산 추적
+- 선택 근거와 실행 환경은 [ADR-0001](docs/decisions/ADR-0001-initial-tech-stack.md)에 기록합니다.
 
 ## 한계
 
@@ -33,7 +34,7 @@
 ## 문서
 
 - [프로젝트 계획](docs/PROJECT_PLAN.md): 배경, 목표, 범위, 업무 규칙, 아키텍처 방향, 단계별 완료 기준, 마일스톤
-- [ADR-0001 초기 기술 스택](docs/decisions/ADR-0001-initial-tech-stack.md): 제안 상태, 쟁점 4개 미결정
+- [ADR-0001 초기 기술 스택](docs/decisions/ADR-0001-initial-tech-stack.md): 언어·프레임워크, DB, 실행 환경·비용, 모듈 경계 (채택)
 
 ## 실행 방법
 
