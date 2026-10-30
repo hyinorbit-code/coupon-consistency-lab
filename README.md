@@ -32,7 +32,8 @@
 
 ## 문서
 
-- [프로젝트 계획](docs/PROJECT_PLAN.md): 배경, 목표, 범위, 업무 규칙, 아키텍처 방향, 단계별 완료 기준
+- [프로젝트 계획](docs/PROJECT_PLAN.md): 배경, 목표, 범위, 업무 규칙, 아키텍처 방향, 단계별 완료 기준, 마일스톤
+- [ADR-0001 초기 기술 스택](docs/decisions/ADR-0001-initial-tech-stack.md): 제안 상태, 쟁점 4개 미결정
 
 ## 실행 방법
 
