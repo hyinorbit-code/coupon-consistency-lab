@@ -33,6 +33,7 @@
 | code | status | 의미 |
 | --- | --- | --- |
 | `USER_NOT_FOUND` | 404 | 사용자 없음 |
+| `INVALID_EMAIL` | 400 | 이메일이 비어 있거나 형식이 틀림(대부분은 `INVALID_INPUT`으로 먼저 걸러짐) |
 | `INVALID_PASSWORD` | 400 | 비밀번호 정책 위반(공백뿐, 8~64자 아님). `detail`에 구체적인 이유 |
 | `INVALID_VERIFICATION_TOKEN` | 400 | 인증 토큰이 없거나 만료·사용됨(구분하지 않음) |
 

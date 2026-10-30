@@ -1,5 +1,6 @@
 package io.github.hyinorbitcode.couponlab.user.service;
 
+import io.github.hyinorbitcode.couponlab.user.entity.EmailAddress;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import io.github.hyinorbitcode.couponlab.user.event.SignupMailEvents.AlreadyRegisteredMailRequested;
 import io.github.hyinorbitcode.couponlab.user.repository.UserRepository;
@@ -28,23 +29,23 @@ public class SignupService {
 
     public void signUp(String email, String rawPassword, String nickname) {
         PasswordPolicy.validate(rawPassword);
-        String normalizedEmail = User.normalizeEmail(email);
+        EmailAddress emailAddress = new EmailAddress(email);
         // BCrypt는 일부러 느리므로 트랜잭션 밖에서 해시한다.
         String passwordHash = passwordEncoder.encode(rawPassword);
         try {
-            transactionTemplate.executeWithoutResult(status -> userRepository.findByEmail(normalizedEmail)
+            transactionTemplate.executeWithoutResult(status -> userRepository.findByEmail(emailAddress)
                     .ifPresentOrElse(this::handleExisting,
-                            () -> createPendingUser(normalizedEmail, passwordHash, nickname)));
+                            () -> createPendingUser(emailAddress, passwordHash, nickname)));
         } catch (DataIntegrityViolationException concurrentSignup) {
             // 같은 이메일의 동시 가입에서 진 쪽. 먼저 커밋된 사용자를 기존 사용자로 처리한다.
-            transactionTemplate.executeWithoutResult(status -> userRepository.findByEmail(normalizedEmail)
+            transactionTemplate.executeWithoutResult(status -> userRepository.findByEmail(emailAddress)
                     .ifPresent(this::handleExisting));
         }
     }
 
-    private void createPendingUser(String normalizedEmail, String passwordHash, String nickname) {
+    private void createPendingUser(EmailAddress email, String passwordHash, String nickname) {
         User user = userRepository.saveAndFlush(
-                User.signUpWithEmail(normalizedEmail, passwordHash, nickname, clock.instant()));
+                User.signUpWithEmail(email, passwordHash, nickname, clock.instant()));
         emailVerificationService.issueAndRequestMail(user);
     }
 
@@ -52,7 +53,7 @@ public class SignupService {
         if (user.isPendingVerification()) {
             emailVerificationService.issueAndRequestMailIfIntervalPassed(user);
         } else {
-            eventPublisher.publishEvent(new AlreadyRegisteredMailRequested(user.getEmail()));
+            eventPublisher.publishEvent(new AlreadyRegisteredMailRequested(user.getEmail().value()));
         }
     }
 }

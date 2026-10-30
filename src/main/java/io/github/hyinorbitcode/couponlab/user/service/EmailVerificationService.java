@@ -1,6 +1,7 @@
 package io.github.hyinorbitcode.couponlab.user.service;
 
 import io.github.hyinorbitcode.couponlab.user.config.SignupProperties;
+import io.github.hyinorbitcode.couponlab.user.entity.EmailAddress;
 import io.github.hyinorbitcode.couponlab.user.entity.EmailVerificationToken;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import io.github.hyinorbitcode.couponlab.user.event.SignupMailEvents.VerificationMailRequested;
@@ -51,7 +52,7 @@ public class EmailVerificationService {
      */
     @Transactional
     public void resend(String email) {
-        userRepository.findByEmail(User.normalizeEmail(email))
+        userRepository.findByEmail(new EmailAddress(email))
                 .filter(User::isPendingVerification)
                 .ifPresent(this::issueAndRequestMailIfIntervalPassed);
     }
@@ -61,7 +62,7 @@ public class EmailVerificationService {
         var generated = verificationTokens.generate();
         tokenRepository.save(EmailVerificationToken.issue(
                 user.getId(), generated.hash(), clock.instant(), signupProperties.verificationTtl()));
-        eventPublisher.publishEvent(new VerificationMailRequested(user.getEmail(), user.getNickname(), generated.raw()));
+        eventPublisher.publishEvent(new VerificationMailRequested(user.getEmail().value(), user.getNickname(), generated.raw()));
     }
 
     public void issueAndRequestMailIfIntervalPassed(User user) {

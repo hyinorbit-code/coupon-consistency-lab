@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,13 +25,12 @@ import lombok.NoArgsConstructor;
 public class User {
 
     public static final int MAX_NICKNAME_LENGTH = 50;
-    public static final int MAX_EMAIL_LENGTH = 254;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
+    private EmailAddress email;
 
     private String passwordHash;
 
@@ -65,22 +63,17 @@ public class User {
 
     /**
      * 이메일로 가입하는 사용자. 이메일 인증 전까지 로그인할 수 없다(ADR-0010).
-     * 이메일은 {@link #normalizeEmail(String)}로 정규화된 값이어야 하고, 비밀번호는 해시만 받는다.
+     * 이메일은 이미 정규화된 {@link EmailAddress}로, 비밀번호는 해시로만 받는다.
      */
-    public static User signUpWithEmail(String normalizedEmail, String passwordHash, String nickname, Instant now) {
+    public static User signUpWithEmail(EmailAddress email, String passwordHash, String nickname, Instant now) {
+        Objects.requireNonNull(email, "email");
         Objects.requireNonNull(now, "now");
-        requireNormalizedEmail(normalizedEmail);
         requireText(passwordHash, "passwordHash");
         requireNickname(nickname);
         User user = new User(nickname, Role.USER, UserStatus.PENDING_VERIFICATION, now);
-        user.email = normalizedEmail;
+        user.email = email;
         user.passwordHash = passwordHash;
         return user;
-    }
-
-    /** 이메일은 앞뒤 공백을 지우고 소문자로 저장한다. User@Example.com과 user@example.com은 같은 계정이다. */
-    public static String normalizeEmail(String email) {
-        return email == null ? null : email.strip().toLowerCase(Locale.ROOT);
     }
 
     /** 이메일 인증을 마치고 활성화한다. 이미 활성인 사용자에게는 아무 일도 하지 않는다. */
@@ -94,17 +87,6 @@ public class User {
 
     public boolean isPendingVerification() {
         return status == UserStatus.PENDING_VERIFICATION;
-    }
-
-    /** 서비스가 정규화해서 넘겨야 한다. 어기면 사용자 입력 오류가 아니라 코드 오류다. */
-    private static void requireNormalizedEmail(String email) {
-        requireText(email, "email");
-        if (email.length() > MAX_EMAIL_LENGTH) {
-            throw new IllegalArgumentException("email must be at most " + MAX_EMAIL_LENGTH + " characters");
-        }
-        if (!email.equals(normalizeEmail(email))) {
-            throw new IllegalArgumentException("email must be normalized before creating a user");
-        }
     }
 
     private static void requireText(String value, String name) {

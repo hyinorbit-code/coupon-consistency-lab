@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 class UserTests {
 
     private static final Instant NOW = Instant.parse("2026-11-01T00:00:00Z");
+    private static final EmailAddress EMAIL = new EmailAddress("user@example.com");
 
     @Test
     @DisplayName("닉네임은 비어 있을 수 없다")
@@ -43,7 +44,7 @@ class UserTests {
     @Test
     @DisplayName("이메일 가입자는 인증 대기 상태의 USER로 만들어진다")
     void signsUpWithEmailAsPendingUser() {
-        User user = User.signUpWithEmail("user@example.com", "{bcrypt}hash", "nick", NOW);
+        User user = User.signUpWithEmail(EMAIL, "{bcrypt}hash", "nick", NOW);
 
         assertThat(user.getStatus()).isEqualTo(UserStatus.PENDING_VERIFICATION);
         assertThat(user.getRole()).isEqualTo(Role.USER);
@@ -51,31 +52,18 @@ class UserTests {
     }
 
     @Test
-    @DisplayName("정규화되지 않은 이메일로는 가입시킬 수 없다")
-    void rejectsUnnormalizedEmail() {
-        assertThatThrownBy(() -> User.signUpWithEmail("User@Example.com", "{bcrypt}hash", "nick", NOW))
+    @DisplayName("이메일 없이, 또는 비어 있는 비밀번호 해시로는 가입시킬 수 없다")
+    void rejectsMissingEmailOrBlankPasswordHash() {
+        assertThatThrownBy(() -> User.signUpWithEmail(null, "{bcrypt}hash", "nick", NOW))
+                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> User.signUpWithEmail(EMAIL, " ", "nick", NOW))
                 .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("비어 있는 이메일이나 비밀번호 해시로는 가입시킬 수 없다")
-    void rejectsBlankEmailOrPasswordHash() {
-        assertThatThrownBy(() -> User.signUpWithEmail(" ", "{bcrypt}hash", "nick", NOW))
-                .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> User.signUpWithEmail("user@example.com", " ", "nick", NOW))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("이메일은 앞뒤 공백을 지우고 소문자로 정규화한다")
-    void normalizesEmail() {
-        assertThat(User.normalizeEmail("  User@Example.COM ")).isEqualTo("user@example.com");
     }
 
     @Test
     @DisplayName("이메일 인증을 마치면 활성화되고 인증 시각이 기록된다")
     void verifiesEmail() {
-        User user = User.signUpWithEmail("user@example.com", "{bcrypt}hash", "nick", NOW);
+        User user = User.signUpWithEmail(EMAIL, "{bcrypt}hash", "nick", NOW);
         Instant verifiedAt = NOW.plusSeconds(60);
 
         user.verifyEmail(verifiedAt);

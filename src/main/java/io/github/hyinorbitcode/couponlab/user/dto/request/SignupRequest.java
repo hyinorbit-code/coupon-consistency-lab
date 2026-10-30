@@ -1,5 +1,6 @@
 package io.github.hyinorbitcode.couponlab.user.dto.request;
 
+import io.github.hyinorbitcode.couponlab.user.entity.EmailAddress;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import io.github.hyinorbitcode.couponlab.user.service.PasswordPolicy;
 import jakarta.validation.constraints.Email;
@@ -8,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record SignupRequest(
-        @NotBlank @Email @Size(max = User.MAX_EMAIL_LENGTH) String email,
+        @NotBlank @Email @Size(max = EmailAddress.MAX_LENGTH) String email,
         @NotNull @Size(min = PasswordPolicy.MIN_LENGTH, max = PasswordPolicy.MAX_LENGTH)
         String password,
         @NotBlank @Size(max = User.MAX_NICKNAME_LENGTH) String nickname) {

@@ -39,7 +39,7 @@ user/
 │   └── response/              XxxResponse
 ├── service/                   유스케이스 서비스, 토큰 유틸
 ├── repository/                Spring Data 리포지토리
-├── entity/                    JPA 엔티티, enum
+├── entity/                    JPA 엔티티, enum, 값 객체와 JPA 컨버터(예: EmailAddress)
 ├── exception/                 모듈 ErrorCode enum과 예외
 ├── config/                    모듈 설정값, MVC 설정, 인자 리졸버
 ├── event/                     모듈 내부 이벤트와 리스너
