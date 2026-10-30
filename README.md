@@ -47,6 +47,7 @@
 - [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
 - [ADR-0010 로그인 수단과 응모 자격](docs/decisions/ADR-0010-login-methods-and-eligibility.md): 이메일(인증)·카카오 로그인, 응모는 카카오 연동 사용자만 (채택)
 - [ADR-0011 프론트엔드](docs/decisions/ADR-0011-frontend.md): React 정적 SPA를 S3 + CloudFront로 배포, 같은 도메인에서 `/api/*`만 백엔드로 (채택)
+- [프론트엔드 API 계약](docs/api/FRONTEND_API_CONTRACT.md): 화면이 기대하는 요청·응답, 오류 코드, 엔드포인트별 구현·목업 상태
 - [ADR-0012 이메일 회원가입과 인증](docs/decisions/ADR-0012-email-signup-and-verification.md): 계정 존재 비노출, 토큰 해시 저장, POST 인증, 커밋 후 메일 발송 (채택)
 
 ## 실행 방법
@@ -79,7 +80,7 @@ docker exec -it $(docker ps -q --filter ancestor=mysql:8.4 | head -1) mysql --de
 
 실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 있습니다(`/actuator` 제외).
 
-프론트엔드(React)는 백엔드를 띄운 뒤 `frontend/`에서 실행합니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
+프론트엔드(React + Tailwind)는 모든 화면이 만들어져 있고, 아직 백엔드에 없는 API는 목업(MSW)으로 동작합니다. 회원가입·이메일 인증은 실제 백엔드를 쓰므로 백엔드를 먼저 띄운 뒤 `frontend/`에서 실행합니다. 화면 오른쪽 아래 DEV 버튼으로 사용자 전환·응모 결과 등을 바꿀 수 있습니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
 
 ```bash
 cd frontend && npm install && npm run dev   # http://localhost:5173, /api는 8080으로 프록시

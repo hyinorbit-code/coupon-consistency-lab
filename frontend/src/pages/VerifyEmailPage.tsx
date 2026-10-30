@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { verifyEmail } from '../api/auth'
+import { errorMessage } from '../api/client'
+import { Alert, LinkButton, LoadingBlock } from '../components/ui'
 
 type Result = { kind: 'pending' } | { kind: 'success'; message: string } | { kind: 'failure'; message: string }
 
@@ -16,42 +18,37 @@ export function VerifyEmailPage() {
   const requested = useRef(false)
 
   useEffect(() => {
-    if (!token || requested.current) {
-      return
-    }
+    if (!token || requested.current) return
     requested.current = true
     verifyEmail(token)
       .then((response) => setResult({ kind: 'success', message: response.message }))
-      .catch((e: unknown) =>
-        setResult({ kind: 'failure', message: e instanceof Error ? e.message : '인증에 실패했습니다' }),
-      )
+      .catch((e: unknown) => setResult({ kind: 'failure', message: errorMessage(e, '인증에 실패했습니다.') }))
   }, [token])
 
-  if (!token) {
-    return (
-      <section>
-        <h1>이메일 인증</h1>
-        <p className="error">인증 링크가 올바르지 않습니다.</p>
-      </section>
-    )
-  }
-
   return (
-    <section>
-      <h1>이메일 인증</h1>
-      {result.kind === 'pending' && <p>인증하는 중…</p>}
+    <div className="mx-auto max-w-sm space-y-6 pt-4 text-center">
+      <h1 className="text-2xl font-bold">이메일 인증</h1>
+      {!token && <Alert kind="error">인증 링크가 올바르지 않습니다.</Alert>}
+      {token && result.kind === 'pending' && <LoadingBlock />}
       {result.kind === 'success' && (
         <>
-          <p>{result.message}</p>
-          <Link to="/login">로그인하러 가기</Link>
+          <p className="text-5xl" aria-hidden>
+            ✅
+          </p>
+          <Alert kind="success">{result.message}</Alert>
+          <LinkButton to="/login" block size="lg">
+            로그인하러 가기
+          </LinkButton>
         </>
       )}
       {result.kind === 'failure' && (
         <>
-          <p className="error">{result.message}</p>
-          <Link to="/signup">회원가입 화면으로</Link>
+          <Alert kind="error">{result.message}</Alert>
+          <LinkButton to="/signup/done" variant="secondary" block>
+            인증 메일 다시 받기
+          </LinkButton>
         </>
       )}
-    </section>
+    </div>
   )
 }
