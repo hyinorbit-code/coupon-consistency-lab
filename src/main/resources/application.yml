@@ -19,3 +19,11 @@ couponlab:
     jwt-secret: ${COUPONLAB_AUTH_JWT_SECRET:}
     issuer: coupon-consistency-lab
     token-ttl: 24h
+  signup:
+    verification-ttl: 24h
+    resend-interval: 1m
+  web:
+    # 인증 메일 링크가 가리키는 프론트엔드 주소(ADR-0011)
+    base-url: ${COUPONLAB_WEB_BASE_URL:http://localhost:5173}
+  mail:
+    from: no-reply@coupon-lab.local

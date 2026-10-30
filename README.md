@@ -47,6 +47,7 @@
 - [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
 - [ADR-0010 로그인 수단과 응모 자격](docs/decisions/ADR-0010-login-methods-and-eligibility.md): 이메일(인증)·카카오 로그인, 응모는 카카오 연동 사용자만 (채택)
 - [ADR-0011 프론트엔드](docs/decisions/ADR-0011-frontend.md): React 정적 SPA를 S3 + CloudFront로 배포, 같은 도메인에서 `/api/*`만 백엔드로 (채택)
+- [ADR-0012 이메일 회원가입과 인증](docs/decisions/ADR-0012-email-signup-and-verification.md): 계정 존재 비노출, 토큰 해시 저장, POST 인증, 커밋 후 메일 발송 (채택)
 
 ## 실행 방법
 
@@ -56,7 +57,7 @@
 ./gradlew test             # 단위·통합 테스트
 ./gradlew concurrencyTest  # 동시성 테스트 ("concurrency" 태그)
 ./gradlew check            # 전체
-./gradlew bootTestRun      # Testcontainers MySQL과 함께 로컬 실행 (test·experiment 프로필)
+./gradlew bootTestRun      # Testcontainers MySQL·Mailpit과 함께 로컬 실행 (test·experiment 프로필)
 ```
 
 로컬 실행 중 실험용 토큰 발급과 내 정보 조회:
@@ -66,6 +67,14 @@ TOKEN=$(curl -s -X POST localhost:8080/api/experiment/auth/token \
   -H 'Content-Type: application/json' \
   -d '{"providerUserId":"user-1","nickname":"tester","role":"USER"}' | jq -r .accessToken)
 curl -s localhost:8080/api/users/me -H "Authorization: Bearer $TOKEN"
+```
+
+`bootTestRun`은 시작할 때 Mailpit 웹 화면 주소를 콘솔에 출력합니다. 회원가입 인증 메일은 그 화면에서 확인합니다.
+
+실행 중인 MySQL에 접속하려면(데이터는 앱을 끄면 사라집니다):
+
+```bash
+docker exec -it $(docker ps -q --filter ancestor=mysql:8.4 | head -1) mysql --default-character-set=utf8mb4 -utest -ptest test
 ```
 
 실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 있습니다(`/actuator` 제외).

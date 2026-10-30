@@ -58,3 +58,12 @@ dd {
 .error {
   color: #d33;
 }
+
+nav {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  font-size: 14px;
+}

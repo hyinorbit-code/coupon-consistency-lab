@@ -24,4 +24,4 @@ npm run lint    # oxlint
 - 개발 서버는 `/api/*` 요청을 `http://localhost:8080`으로 프록시합니다(`vite.config.ts`). 운영에서는 CloudFront가 같은 역할을 합니다.
 - `src/api/`: 백엔드 API 호출. 오류 응답은 ProblemDetail의 `detail`을 메시지로 씁니다.
 - `src/auth/`: 액세스 토큰을 메모리에만 보관합니다. 새로고침하면 사라지며, 리프레시 토큰 흐름은 사용자 기능 3번에서 추가합니다.
-- `src/pages/`: 화면. 현재는 실험용 로그인(`/login`)과 내 정보(`/me`)뿐입니다.
+- `src/pages/`: 화면. 회원가입(`/signup`, `/signup/done`), 이메일 인증(`/verify-email`), 실험용 로그인(`/login`), 내 정보(`/me`).

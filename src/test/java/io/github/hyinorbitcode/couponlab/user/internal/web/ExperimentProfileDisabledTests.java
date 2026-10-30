@@ -2,6 +2,7 @@ package io.github.hyinorbitcode.couponlab.user.internal.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.hyinorbitcode.couponlab.TestMailConfiguration;
 import io.github.hyinorbitcode.couponlab.TestcontainersConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
  * experiment 프로필 없이 기동하면 실험용 토큰 발급 엔드포인트가 등록되지 않는다.
  */
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, TestMailConfiguration.class})
 @ActiveProfiles("test")
 class ExperimentProfileDisabledTests {
 

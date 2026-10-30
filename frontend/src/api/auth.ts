@@ -24,3 +24,29 @@ export function issueExperimentToken(providerUserId: string, nickname: string, r
 export function fetchMe(token: string) {
   return apiRequest<Me>('/users/me', { token })
 }
+
+export type MessageResponse = {
+  message: string
+}
+
+/** 이메일 회원가입. 계정 존재 여부와 관계없이 같은 응답을 받는다(ADR-0012). */
+export function signUp(email: string, password: string, nickname: string) {
+  return apiRequest<MessageResponse>('/auth/signup', {
+    method: 'POST',
+    body: { email, password, nickname },
+  })
+}
+
+export function verifyEmail(token: string) {
+  return apiRequest<MessageResponse>('/auth/verify-email', {
+    method: 'POST',
+    body: { token },
+  })
+}
+
+export function resendVerificationEmail(email: string) {
+  return apiRequest<MessageResponse>('/auth/verify-email/resend', {
+    method: 'POST',
+    body: { email },
+  })
+}

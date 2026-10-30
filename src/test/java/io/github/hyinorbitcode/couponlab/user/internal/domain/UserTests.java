@@ -39,4 +39,39 @@ class UserTests {
         assertThat(user.getEmail()).isNull();
         assertThat(user.getPasswordHash()).isNull();
     }
+
+    @Test
+    @DisplayName("이메일 가입자는 인증 대기 상태의 USER로 만들어진다")
+    void signsUpWithEmailAsPendingUser() {
+        User user = User.signUpWithEmail("user@example.com", "{bcrypt}hash", "nick", NOW);
+
+        assertThat(user.getStatus()).isEqualTo(UserStatus.PENDING_VERIFICATION);
+        assertThat(user.getRole()).isEqualTo(Role.USER);
+        assertThat(user.isPendingVerification()).isTrue();
+    }
+
+    @Test
+    @DisplayName("정규화되지 않은 이메일로는 가입시킬 수 없다")
+    void rejectsUnnormalizedEmail() {
+        assertThatThrownBy(() -> User.signUpWithEmail("User@Example.com", "{bcrypt}hash", "nick", NOW))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("이메일은 앞뒤 공백을 지우고 소문자로 정규화한다")
+    void normalizesEmail() {
+        assertThat(User.normalizeEmail("  User@Example.COM ")).isEqualTo("user@example.com");
+    }
+
+    @Test
+    @DisplayName("이메일 인증을 마치면 활성화되고 인증 시각이 기록된다")
+    void verifiesEmail() {
+        User user = User.signUpWithEmail("user@example.com", "{bcrypt}hash", "nick", NOW);
+        Instant verifiedAt = NOW.plusSeconds(60);
+
+        user.verifyEmail(verifiedAt);
+
+        assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(user.getEmailVerifiedAt()).isEqualTo(verifiedAt);
+    }
 }
