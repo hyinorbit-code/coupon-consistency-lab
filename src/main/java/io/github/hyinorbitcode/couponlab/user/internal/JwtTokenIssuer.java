@@ -1,0 +1,44 @@
+package io.github.hyinorbitcode.couponlab.user.internal;
+
+import java.time.Clock;
+import java.time.Instant;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Component;
+
+@Component
+class JwtTokenIssuer {
+
+    static final String ROLE_CLAIM = "role";
+
+    private final JwtEncoder jwtEncoder;
+    private final AuthProperties authProperties;
+    private final Clock clock;
+
+    JwtTokenIssuer(JwtEncoder jwtEncoder, AuthProperties authProperties, Clock clock) {
+        this.jwtEncoder = jwtEncoder;
+        this.authProperties = authProperties;
+        this.clock = clock;
+    }
+
+    IssuedToken issue(User user) {
+        Instant now = clock.instant();
+        Instant expiresAt = now.plus(authProperties.tokenTtl());
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(authProperties.issuer())
+                .subject(String.valueOf(user.getId()))
+                .issuedAt(now)
+                .expiresAt(expiresAt)
+                .claim(ROLE_CLAIM, user.getRole().name())
+                .build();
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        String token = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return new IssuedToken(token, expiresAt);
+    }
+
+    record IssuedToken(String accessToken, Instant expiresAt) {
+    }
+}

@@ -9,3 +9,13 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+  mvc:
+    problemdetails:
+      enabled: true
+
+couponlab:
+  auth:
+    # 32바이트 이상. 저장소에 넣지 않고 환경변수로 주입한다(ADR-0007).
+    jwt-secret: ${COUPONLAB_AUTH_JWT_SECRET:}
+    issuer: coupon-consistency-lab
+    token-ttl: 24h

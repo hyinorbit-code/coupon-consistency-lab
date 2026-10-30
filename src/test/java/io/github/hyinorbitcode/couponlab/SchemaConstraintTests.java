@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,8 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * ADR-0006: 불변식을 강제하는 DB 제약이 실제 MySQL에서 동작하는지 검증한다.
  * MySQL CHECK 위반(에러 3819)은 Spring이 DataIntegrityViolationException으로 변환하지 않으므로 제약 이름으로 검증한다.
  */
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
+@IntegrationTest
 class SchemaConstraintTests {
 
     @Autowired

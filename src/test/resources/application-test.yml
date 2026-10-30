@@ -1,0 +1,4 @@
+# 테스트와 로컬 실행(bootTestRun) 전용 설정. 실제 환경에서 쓰지 않는다.
+couponlab:
+  auth:
+    jwt-secret: test-only-secret-key-for-local-and-ci-0123456789
