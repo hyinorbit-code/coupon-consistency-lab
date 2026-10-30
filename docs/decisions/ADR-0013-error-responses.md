@@ -54,7 +54,16 @@
 }
 ```
 
-### 4. 구현 메모
+### 4. 업무 예외와 IllegalArgumentException의 구분
+
+| 상황 | 예외 | 응답 메시지 |
+| --- | --- | --- |
+| 사용자가 고칠 수 있는 입력·규칙 위반 (예: 비밀번호 정책, 만료된 인증 링크) | `BusinessException` 하위 클래스 + 모듈 ErrorCode | 무엇을 고쳐야 하는지 구체적으로 (그대로 노출) |
+| 코드가 잘못 호출된 경우 (예: 정규화하지 않은 이메일로 엔티티 생성) | `IllegalArgumentException` | 일반 메시지 `입력값을 확인해 주세요.` (개발자용 메시지는 로그에만) |
+
+여러 조건을 한 줄의 `||`로 묶지 않고, 원인별로 나눠 검사하고 원인별 메시지를 준다. 재사용되는 업무 규칙은 정책 클래스로 분리한다(예: `PasswordPolicy`). 요청 DTO의 검증 애너테이션도 같은 상수를 참조해 웹 검증과 서비스 검증이 어긋나지 않게 한다.
+
+### 5. 구현 메모
 
 - `GlobalExceptionHandler`는 `ResponseEntityExceptionHandler`를 상속해 MVC 표준 예외 처리를 재사용하고, `handleExceptionInternal`에서 code를 덧붙인다. 일부 표준 예외(없는 경로 등)는 본문을 `null`로 넘기므로 예외가 가진 ProblemDetail(`ErrorResponse.getBody()`)을 먼저 꺼낸다.
 - 백엔드는 API만 제공하므로 `spring.web.resources.add-mappings=false`로 정적 리소스 매핑을 끈다. 켜 두면 없는 경로가 정적 리소스 핸들러로 빠져 전역 핸들러를 거치지 않는다.

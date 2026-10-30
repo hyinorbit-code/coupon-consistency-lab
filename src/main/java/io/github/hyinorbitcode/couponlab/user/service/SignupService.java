@@ -19,9 +19,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 @RequiredArgsConstructor
 public class SignupService {
 
-    public static final int MIN_PASSWORD_LENGTH = 8;
-    public static final int MAX_PASSWORD_LENGTH = 64;
-
     private final UserRepository userRepository;
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
@@ -30,7 +27,7 @@ public class SignupService {
     private final Clock clock;
 
     public void signUp(String email, String rawPassword, String nickname) {
-        requirePasswordPolicy(rawPassword);
+        PasswordPolicy.validate(rawPassword);
         String normalizedEmail = User.normalizeEmail(email);
         // BCrypt는 일부러 느리므로 트랜잭션 밖에서 해시한다.
         String passwordHash = passwordEncoder.encode(rawPassword);
@@ -56,14 +53,6 @@ public class SignupService {
             emailVerificationService.issueAndRequestMailIfIntervalPassed(user);
         } else {
             eventPublisher.publishEvent(new AlreadyRegisteredMailRequested(user.getEmail()));
-        }
-    }
-
-    private static void requirePasswordPolicy(String rawPassword) {
-        if (rawPassword == null || rawPassword.length() < MIN_PASSWORD_LENGTH
-                || rawPassword.length() > MAX_PASSWORD_LENGTH || rawPassword.isBlank()) {
-            throw new IllegalArgumentException(
-                    "password must be " + MIN_PASSWORD_LENGTH + "-" + MAX_PASSWORD_LENGTH + " characters");
         }
     }
 }

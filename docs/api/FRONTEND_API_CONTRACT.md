@@ -33,6 +33,7 @@
 | code | status | 의미 |
 | --- | --- | --- |
 | `USER_NOT_FOUND` | 404 | 사용자 없음 |
+| `INVALID_PASSWORD` | 400 | 비밀번호 정책 위반(공백뿐, 8~64자 아님). `detail`에 구체적인 이유 |
 | `INVALID_VERIFICATION_TOKEN` | 400 | 인증 토큰이 없거나 만료·사용됨(구분하지 않음) |
 
 업무 코드(목업, 백엔드 구현 예정):

@@ -58,6 +58,15 @@ class UserTests {
     }
 
     @Test
+    @DisplayName("비어 있는 이메일이나 비밀번호 해시로는 가입시킬 수 없다")
+    void rejectsBlankEmailOrPasswordHash() {
+        assertThatThrownBy(() -> User.signUpWithEmail(" ", "{bcrypt}hash", "nick", NOW))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> User.signUpWithEmail("user@example.com", " ", "nick", NOW))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("이메일은 앞뒤 공백을 지우고 소문자로 정규화한다")
     void normalizesEmail() {
         assertThat(User.normalizeEmail("  User@Example.COM ")).isEqualTo("user@example.com");

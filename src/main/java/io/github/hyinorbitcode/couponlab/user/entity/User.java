@@ -69,13 +69,8 @@ public class User {
      */
     public static User signUpWithEmail(String normalizedEmail, String passwordHash, String nickname, Instant now) {
         Objects.requireNonNull(now, "now");
-        if (normalizedEmail == null || normalizedEmail.isBlank() || normalizedEmail.length() > MAX_EMAIL_LENGTH
-                || !normalizedEmail.equals(normalizeEmail(normalizedEmail))) {
-            throw new IllegalArgumentException("email must be a normalized address");
-        }
-        if (passwordHash == null || passwordHash.isBlank()) {
-            throw new IllegalArgumentException("passwordHash must not be blank");
-        }
+        requireNormalizedEmail(normalizedEmail);
+        requireText(passwordHash, "passwordHash");
         requireNickname(nickname);
         User user = new User(nickname, Role.USER, UserStatus.PENDING_VERIFICATION, now);
         user.email = normalizedEmail;
@@ -101,10 +96,25 @@ public class User {
         return status == UserStatus.PENDING_VERIFICATION;
     }
 
-    private static void requireNickname(String nickname) {
-        if (nickname == null || nickname.isBlank()) {
-            throw new IllegalArgumentException("nickname must not be blank");
+    /** 서비스가 정규화해서 넘겨야 한다. 어기면 사용자 입력 오류가 아니라 코드 오류다. */
+    private static void requireNormalizedEmail(String email) {
+        requireText(email, "email");
+        if (email.length() > MAX_EMAIL_LENGTH) {
+            throw new IllegalArgumentException("email must be at most " + MAX_EMAIL_LENGTH + " characters");
         }
+        if (!email.equals(normalizeEmail(email))) {
+            throw new IllegalArgumentException("email must be normalized before creating a user");
+        }
+    }
+
+    private static void requireText(String value, String name) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(name + " must not be blank");
+        }
+    }
+
+    private static void requireNickname(String nickname) {
+        requireText(nickname, "nickname");
         if (nickname.length() > MAX_NICKNAME_LENGTH) {
             throw new IllegalArgumentException("nickname must be at most " + MAX_NICKNAME_LENGTH + " characters");
         }

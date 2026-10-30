@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 /** user 모듈의 업무 오류(ADR-0013). 응답 code는 상수 이름 그대로다. */
 public enum UserErrorCode implements ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 규칙에 맞지 않습니다."),
     INVALID_VERIFICATION_TOKEN(HttpStatus.BAD_REQUEST, "인증 링크가 유효하지 않거나 만료되었습니다. 인증 메일을 다시 요청해 주세요.");
 
     private final HttpStatus status;

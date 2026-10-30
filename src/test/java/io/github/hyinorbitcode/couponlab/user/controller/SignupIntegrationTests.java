@@ -159,6 +159,17 @@ class SignupIntegrationTests {
     }
 
     @Test
+    @DisplayName("길이는 맞지만 공백뿐인 비밀번호는 400 INVALID_PASSWORD와 구체적인 메시지를 받는다")
+    void rejectsBlankPasswordWithSpecificMessage() throws Exception {
+        signUp(EMAIL, " ".repeat(10), "가입자")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_PASSWORD"))
+                .andExpect(jsonPath("$.detail").value("비밀번호를 입력해 주세요."));
+
+        assertThat(countUsers()).isZero();
+    }
+
+    @Test
     @DisplayName("없는 이메일로 재발송을 요청해도 같은 202 응답을 주고 메일은 보내지 않는다")
     void resendForUnknownEmailRevealsNothing() throws Exception {
         mockMvc.perform(post("/api/auth/verify-email/resend")
