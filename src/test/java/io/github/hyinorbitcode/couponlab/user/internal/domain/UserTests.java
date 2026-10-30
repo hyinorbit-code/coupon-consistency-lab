@@ -15,7 +15,7 @@ class UserTests {
     @Test
     @DisplayName("닉네임은 비어 있을 수 없다")
     void rejectsBlankNickname() {
-        assertThatThrownBy(() -> User.create(AuthProvider.EXPERIMENT, "id-1", " ", Role.USER, NOW))
+        assertThatThrownBy(() -> User.createWithoutCredentials(" ", Role.USER, NOW))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -24,25 +24,19 @@ class UserTests {
     void rejectsTooLongNickname() {
         String nickname = "a".repeat(User.MAX_NICKNAME_LENGTH + 1);
 
-        assertThatThrownBy(() -> User.create(AuthProvider.EXPERIMENT, "id-1", nickname, Role.USER, NOW))
+        assertThatThrownBy(() -> User.createWithoutCredentials(nickname, Role.USER, NOW))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("제공자 식별자는 64자를 넘을 수 없다")
-    void rejectsTooLongProviderUserId() {
-        String providerUserId = "a".repeat(User.MAX_PROVIDER_USER_ID_LENGTH + 1);
-
-        assertThatThrownBy(() -> User.create(AuthProvider.EXPERIMENT, providerUserId, "nick", Role.USER, NOW))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("유효한 값으로 사용자를 만든다")
-    void createsUser() {
-        User user = User.create(AuthProvider.EXPERIMENT, "id-1", "nick", Role.ADMIN, NOW);
+    @DisplayName("외부 계정 사용자는 이메일·비밀번호 없이 바로 활성 상태로 만들어진다")
+    void createsUserWithoutCredentials() {
+        User user = User.createWithoutCredentials("nick", Role.ADMIN, NOW);
 
         assertThat(user.getNickname()).isEqualTo("nick");
         assertThat(user.getRole()).isEqualTo(Role.ADMIN);
+        assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        assertThat(user.getEmail()).isNull();
+        assertThat(user.getPasswordHash()).isNull();
     }
 }

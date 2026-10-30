@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.hyinorbitcode.couponlab.DatabaseCleaner;
 import io.github.hyinorbitcode.couponlab.IntegrationTest;
 import io.github.hyinorbitcode.couponlab.user.Role;
-import io.github.hyinorbitcode.couponlab.user.internal.domain.AuthProvider;
+import io.github.hyinorbitcode.couponlab.user.internal.domain.IdentityProvider;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,7 +51,7 @@ class UserConcurrencyTests {
                 results.add(executor.submit(() -> {
                     ready.countDown();
                     start.await();
-                    return userService.findOrCreate(AuthProvider.EXPERIMENT, "same-user", "닉네임", Role.USER).getId();
+                    return userService.findOrCreate(IdentityProvider.EXPERIMENT, "same-user", "닉네임", Role.USER).getId();
                 }));
             }
             assertThat(ready.await(10, TimeUnit.SECONDS)).isTrue();
@@ -64,7 +64,10 @@ class UserConcurrencyTests {
 
             assertThat(userIds).hasSize(1);
         }
+        // 막힌 쪽의 사용자 INSERT도 함께 롤백되어 연동 계정 없는 사용자가 남지 않는다.
         Integer users = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
+        Integer identities = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM user_identities", Integer.class);
         assertThat(users).isEqualTo(1);
+        assertThat(identities).isEqualTo(1);
     }
 }

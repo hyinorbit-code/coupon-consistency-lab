@@ -42,7 +42,11 @@
 
 ## 결과
 
-- 사용자 모델이 "사용자 + 연동 계정"으로 바뀐다. `users`에서 제공자 컬럼을 빼고 `user_identities`를 추가하는 V2 마이그레이션을 1번에서 작성한다(ADR-0006의 "필요할 때 마이그레이션" 원칙).
+- 사용자 모델이 "사용자 + 연동 계정"으로 바뀐다. V2 마이그레이션(`V2__split_user_identities_and_add_email_credentials.sql`)으로 반영했다(ADR-0006의 "필요할 때 마이그레이션" 원칙).
+  - `user_identities`: `UNIQUE(provider, provider_user_id)`, `UNIQUE(user_id, provider)`
+  - `users`: 제공자 컬럼 제거, `email`(유니크)·`password_hash`·`status`·`email_verified_at` 추가. 이메일·비밀번호 동시 존재, 인증 대기는 이메일 가입자만, 활성 이메일 가입자는 인증 시각 필수를 CHECK로 강제
+  - `email_verification_tokens`: 토큰 원문 대신 SHA-256 해시 저장
+  - 기존 사용자는 같은 ID로 연동 계정에 옮겨지고 활성 상태가 된다(`MigrationV2Tests`로 검증). 외부 계정 첫 로그인은 사용자와 연동 계정을 한 트랜잭션에서 만들고, 동시 요청으로 막힌 쪽은 통째로 롤백된다.
 - 토큰 유효기간(ADR-0007의 24시간)은 3번에서 액세스·리프레시 구조로 바꾸며 그때 새 ADR로 기록한다.
 - 이 작업만큼 1단계 핵심 기능(선착순 할당)과 1차 마일스톤이 늦어진다. 회원가입·로그인 구현 경험을 얻기 위한 의도적인 선택이다.
 - 다른 로그인 수단에 응모 자격을 주려면 먼저 사람 단위 식별 방법을 정하고 새 ADR로 결정한다.

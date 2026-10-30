@@ -99,6 +99,63 @@ class SchemaConstraintTests {
                 .hasMessageContaining("ck_drop_events_period");
     }
 
+    @Test
+    @DisplayName("카카오 회원번호 하나는 사용자 한 명에게만 연동된다")
+    void rejectsSameKakaoIdentityForTwoUsers() {
+        insertIdentity(userId, "KAKAO", "kakao-1");
+
+        assertThatThrownBy(() -> insertIdentity(otherUserId, "KAKAO", "kakao-1"))
+                .isInstanceOf(DuplicateKeyException.class);
+    }
+
+    @Test
+    @DisplayName("사용자 한 명에게 카카오 계정을 두 개 연동할 수 없다")
+    void rejectsSecondKakaoIdentityForSameUser() {
+        insertIdentity(userId, "KAKAO", "kakao-1");
+
+        assertThatThrownBy(() -> insertIdentity(userId, "KAKAO", "kakao-2"))
+                .isInstanceOf(DuplicateKeyException.class);
+    }
+
+    @Test
+    @DisplayName("같은 이메일로 두 사용자를 만들 수 없다")
+    void rejectsDuplicateEmail() {
+        insertEmailUser("user@example.com", "ACTIVE", true);
+
+        assertThatThrownBy(() -> insertEmailUser("user@example.com", "PENDING_VERIFICATION", false))
+                .isInstanceOf(DuplicateKeyException.class);
+    }
+
+    @Test
+    @DisplayName("이메일과 비밀번호 해시는 함께 있거나 함께 없다")
+    void rejectsEmailWithoutPassword() {
+        assertThatThrownBy(() -> jdbcTemplate.update("""
+                INSERT INTO users (email, nickname, role, status, email_verified_at, created_at)
+                VALUES ('user@example.com', 'nick', 'USER', 'ACTIVE', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))
+                """))
+                .isInstanceOf(DataAccessException.class)
+                .hasMessageContaining("ck_users_credentials");
+    }
+
+    @Test
+    @DisplayName("인증 대기 상태는 이메일 가입자만 가질 수 있다")
+    void rejectsPendingUserWithoutEmail() {
+        assertThatThrownBy(() -> jdbcTemplate.update("""
+                INSERT INTO users (nickname, role, status, created_at)
+                VALUES ('nick', 'USER', 'PENDING_VERIFICATION', UTC_TIMESTAMP(6))
+                """))
+                .isInstanceOf(DataAccessException.class)
+                .hasMessageContaining("ck_users_pending");
+    }
+
+    @Test
+    @DisplayName("활성 이메일 가입자는 인증 시각이 있어야 한다")
+    void rejectsActiveEmailUserWithoutVerification() {
+        assertThatThrownBy(() -> insertEmailUser("user@example.com", "ACTIVE", false))
+                .isInstanceOf(DataAccessException.class)
+                .hasMessageContaining("ck_users_verified");
+    }
+
     private long insertDropEvent() {
         jdbcTemplate.update("""
                 INSERT INTO drop_events (title, prize_description, open_at, close_at, status, created_at)
@@ -108,12 +165,26 @@ class SchemaConstraintTests {
         return lastInsertId();
     }
 
-    private long insertUser(String providerUserId) {
+    private long insertUser(String nickname) {
         jdbcTemplate.update("""
-                INSERT INTO users (auth_provider, provider_user_id, nickname, role, created_at)
-                VALUES ('EXPERIMENT', ?, ?, 'USER', UTC_TIMESTAMP(6))
-                """, providerUserId, providerUserId);
+                INSERT INTO users (nickname, role, status, created_at)
+                VALUES (?, 'USER', 'ACTIVE', UTC_TIMESTAMP(6))
+                """, nickname);
         return lastInsertId();
+    }
+
+    private void insertIdentity(long ownerId, String provider, String providerUserId) {
+        jdbcTemplate.update("""
+                INSERT INTO user_identities (user_id, provider, provider_user_id, linked_at)
+                VALUES (?, ?, ?, UTC_TIMESTAMP(6))
+                """, ownerId, provider, providerUserId);
+    }
+
+    private void insertEmailUser(String email, String status, boolean verified) {
+        jdbcTemplate.update("""
+                INSERT INTO users (email, password_hash, nickname, role, status, email_verified_at, created_at)
+                VALUES (?, '{bcrypt}hash', 'nick', 'USER', ?, IF(?, UTC_TIMESTAMP(6), NULL), UTC_TIMESTAMP(6))
+                """, email, status, verified);
     }
 
     /** 실제 암호화는 1단계 기능 구현에서 다룬다. 여기서는 seed로 서로 다른 해시만 만든다. */
