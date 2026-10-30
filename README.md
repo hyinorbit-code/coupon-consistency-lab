@@ -62,12 +62,18 @@
 로컬 실행 중 실험용 토큰 발급과 내 정보 조회:
 
 ```bash
-TOKEN=$(curl -s -X POST localhost:8080/experiment/auth/token \
+TOKEN=$(curl -s -X POST localhost:8080/api/experiment/auth/token \
   -H 'Content-Type: application/json' \
   -d '{"providerUserId":"user-1","nickname":"tester","role":"USER"}' | jq -r .accessToken)
-curl -s localhost:8080/users/me -H "Authorization: Bearer $TOKEN"
+curl -s localhost:8080/api/users/me -H "Authorization: Bearer $TOKEN"
 ```
 
-실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다.
+실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 있습니다(`/actuator` 제외).
+
+프론트엔드(React)는 백엔드를 띄운 뒤 `frontend/`에서 실행합니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
+
+```bash
+cd frontend && npm install && npm run dev   # http://localhost:5173, /api는 8080으로 프록시
+```
 
 배포 명령은 2단계 이후 추가합니다.
