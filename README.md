@@ -41,6 +41,7 @@
 - [ADR-0003 업무 규칙](docs/decisions/ADR-0003-business-rules.md): 참여 제한, 선착순 판정, 코드 할당, 시간, 코드 보관, 권한, 불변식 (채택)
 - [ADR-0004 테스트 전략](docs/decisions/ADR-0004-test-strategy.md): 테스트 계층, 동시성 테스트, 실행·격리, 커버리지 기준 (채택)
 - [ADR-0005 개발 환경](docs/decisions/ADR-0005-dev-environment.md): 맥북 개발, Windows 노트북 전체 스택 실험·부하 생성, AWS 측정 (채택)
+- [ADR-0006 1단계 스키마](docs/decisions/ADR-0006-schema-v1.md): 코드 테이블로 당첨 표현, 불변식의 DB 제약, 코드 암호화·해시 분리, 코드 등록은 오픈 전만 (채택)
 
 ## 실행 방법
 
