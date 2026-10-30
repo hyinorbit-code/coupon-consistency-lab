@@ -12,6 +12,11 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  web:
+    resources:
+      # 백엔드는 API만 제공한다(프론트는 CloudFront). 없는 경로가 정적 리소스 핸들러로 빠지지 않고
+      # 전역 예외 핸들러에서 404 ProblemDetail로 응답되게 한다(ADR-0013).
+      add-mappings: false
 
 couponlab:
   auth:

@@ -95,8 +95,17 @@ export type CodeUploadResult = {
   duplicates: number
 }
 
-/** ProblemDetail(RFC 9457)에 붙는 업무 오류 코드. */
+/** ProblemDetail(RFC 9457)에 붙는 오류 코드(ADR-0013). 공통 코드 + 모듈별 업무 코드. */
 export type ErrorCode =
+  | 'INVALID_INPUT'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'METHOD_NOT_ALLOWED'
+  | 'CONFLICT'
+  | 'INTERNAL_ERROR'
+  | 'USER_NOT_FOUND'
+  | 'INVALID_VERIFICATION_TOKEN'
   | 'INVALID_CREDENTIALS'
   | 'EMAIL_NOT_VERIFIED'
   | 'ACCOUNT_LOCKED'

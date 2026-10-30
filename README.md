@@ -47,6 +47,7 @@
 - [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
 - [ADR-0010 로그인 수단과 응모 자격](docs/decisions/ADR-0010-login-methods-and-eligibility.md): 이메일(인증)·카카오 로그인, 응모는 카카오 연동 사용자만 (채택)
 - [ADR-0011 프론트엔드](docs/decisions/ADR-0011-frontend.md): React 정적 SPA를 S3 + CloudFront로 배포, 같은 도메인에서 `/api/*`만 백엔드로 (채택)
+- [ADR-0013 오류 응답 규칙](docs/decisions/ADR-0013-error-responses.md): 모든 오류를 ProblemDetail + code로, 모듈별 ErrorCode, 전역 핸들러, 401·403 통일 (채택)
 - [프론트엔드 API 계약](docs/api/FRONTEND_API_CONTRACT.md): 화면이 기대하는 요청·응답, 오류 코드, 엔드포인트별 구현·목업 상태
 - [ADR-0012 이메일 회원가입과 인증](docs/decisions/ADR-0012-email-signup-and-verification.md): 계정 존재 비노출, 토큰 해시 저장, POST 인증, 커밋 후 메일 발송 (채택)
 

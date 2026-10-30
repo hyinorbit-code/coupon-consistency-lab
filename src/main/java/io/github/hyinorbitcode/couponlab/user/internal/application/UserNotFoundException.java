@@ -1,12 +1,10 @@
 package io.github.hyinorbitcode.couponlab.user.internal.application;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import io.github.hyinorbitcode.couponlab.common.BusinessException;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class UserNotFoundException extends RuntimeException {
+public class UserNotFoundException extends BusinessException {
 
-    public UserNotFoundException(long userId) {
-        super("user not found: " + userId);
+    public UserNotFoundException() {
+        super(UserErrorCode.USER_NOT_FOUND);
     }
 }

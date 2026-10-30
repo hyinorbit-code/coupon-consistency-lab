@@ -10,11 +10,32 @@
 - 모든 경로는 `/api` 아래에 있다(`ApiPathConfiguration`).
 - 시각은 ISO-8601 UTC 문자열이다. 화면이 한국 시간으로 바꿔 표시한다.
 - 인증은 `Authorization: Bearer <accessToken>`.
-- 오류는 ProblemDetail(RFC 9457)이며, 화면이 분기해야 하는 업무 오류는 `code` 속성을 붙인다.
+- 오류는 ProblemDetail(RFC 9457)이며, **모든 오류 응답에 `code` 속성**이 붙는다(ADR-0013). 입력 검증 실패는 `errors: [{field, message}]`도 함께 온다.
 
 ```json
 { "type": "about:blank", "status": 409, "detail": "아쉽지만 준비된 경품이 모두 소진되었습니다.", "code": "SOLD_OUT" }
 ```
+
+공통 코드(모든 API):
+
+| code | status | 의미 |
+| --- | --- | --- |
+| `INVALID_INPUT` | 400 | 입력 검증 실패, 잘못된 JSON 등 |
+| `UNAUTHORIZED` | 401 | 토큰 없음·만료·변조 |
+| `FORBIDDEN` | 403 | 권한 없음(예: 일반 사용자의 관리자 API) |
+| `NOT_FOUND` | 404 | 없는 경로·대상 |
+| `METHOD_NOT_ALLOWED` | 405 | 지원하지 않는 메서드 |
+| `CONFLICT` | 409 | 현재 상태와 충돌 |
+| `INTERNAL_ERROR` | 500 | 서버 오류(내부 정보는 응답에 없음) |
+
+업무 코드(구현됨):
+
+| code | status | 의미 |
+| --- | --- | --- |
+| `USER_NOT_FOUND` | 404 | 사용자 없음 |
+| `INVALID_VERIFICATION_TOKEN` | 400 | 인증 토큰이 없거나 만료·사용됨(구분하지 않음) |
+
+업무 코드(목업, 백엔드 구현 예정):
 
 | code | status | 의미 |
 | --- | --- | --- |

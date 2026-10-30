@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public User get(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     private User create(IdentityProvider provider, String providerUserId, String nickname, Role role) {

@@ -1,6 +1,7 @@
 package io.github.hyinorbitcode.couponlab.user.internal.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import io.github.hyinorbitcode.couponlab.common.SecurityProblemHandlers;
 import java.time.Clock;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -24,13 +25,14 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * 무상태 JWT 인증(ADR-0007). 쿠키·세션을 쓰지 않으므로 CSRF 보호는 끈다.
+ * 401·403 응답은 공통 ProblemDetail 형식으로 쓴다(ADR-0013).
  */
 @Configuration(proxyBeanMethods = false)
 class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter)
-            throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter,
+            SecurityProblemHandlers problemHandlers) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -38,7 +40,12 @@ class SecurityConfig {
                         .requestMatchers("/api/experiment/**", "/api/auth/**", "/actuator/health", "/error").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(problemHandlers.authenticationEntryPoint())
+                        .accessDeniedHandler(problemHandlers.accessDeniedHandler()))
                 .oauth2ResourceServer(resourceServer -> resourceServer
+                        .authenticationEntryPoint(problemHandlers.authenticationEntryPoint())
+                        .accessDeniedHandler(problemHandlers.accessDeniedHandler())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
     }

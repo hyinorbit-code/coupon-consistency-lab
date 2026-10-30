@@ -12,8 +12,21 @@ const MOCK_TOKEN_PREFIX = 'mock-token.'
 const LOCK_THRESHOLD = 5
 const LOCK_MINUTES = 15
 
+const COMMON_CODES: Record<number, ErrorCode> = {
+  400: 'INVALID_INPUT',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  409: 'CONFLICT',
+  500: 'INTERNAL_ERROR',
+}
+
+/** 백엔드처럼 모든 오류에 code를 붙인다(ADR-0013). 업무 코드가 없으면 상태에 맞는 공통 코드. */
 function problem(status: number, detail: string, code?: ErrorCode) {
-  return HttpResponse.json({ type: 'about:blank', status, detail, code }, { status })
+  return HttpResponse.json(
+    { type: 'about:blank', status, detail, code: code ?? COMMON_CODES[status] ?? 'INTERNAL_ERROR' },
+    { status },
+  )
 }
 
 function bearer(request: Request): string | null {
