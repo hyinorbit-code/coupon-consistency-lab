@@ -12,12 +12,11 @@
 
 ## 처음 읽을 문서
 
-1. [AI 작업 지침](AGENTS.md): 모든 AI 도구와 작업자가 따라야 할 공통 원칙
-2. [프로젝트 계획](docs/PROJECT_PLAN.md): 목적, 범위, 업무 규칙, 아키텍처 방향과 단계별 완료 기준
-3. [검증 계획](docs/VALIDATION_PLAN.md): 정합성·부하·장애 실험 및 측정 규칙
-4. [의사결정 기록](docs/DECISIONS.md): 확정 방향과 미결정 사항
-5. [진행 현황](docs/STATUS.md): 완료한 일, 다음 작업과 인수인계
-6. [실험 기록 양식](docs/templates/EXPERIMENT.md), [ADR 양식](docs/templates/ADR.md)
+1. [프로젝트 계획](docs/PROJECT_PLAN.md): 목적, 범위, 업무 규칙, 아키텍처 방향과 단계별 완료 기준
+2. [검증 계획](docs/VALIDATION_PLAN.md): 정합성·부하·장애 실험 및 측정 규칙
+3. [의사결정 기록](docs/DECISIONS.md): 확정 방향과 미결정 사항
+4. [진행 현황](docs/STATUS.md): 완료한 일, 다음 작업과 인수인계
+5. [실험 기록 양식](docs/templates/EXPERIMENT.md), [ADR 양식](docs/templates/ADR.md)
 
 ## 핵심 사례
 
