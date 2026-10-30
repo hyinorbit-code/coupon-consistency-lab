@@ -4,19 +4,17 @@ import io.github.hyinorbitcode.couponlab.user.CurrentUser;
 import io.github.hyinorbitcode.couponlab.user.Role;
 import io.github.hyinorbitcode.couponlab.user.internal.application.UserService;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 class UserController {
 
     private final UserService userService;
-
-    UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/me")
     UserResponse me(CurrentUser currentUser) {

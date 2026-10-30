@@ -3,6 +3,7 @@ package io.github.hyinorbitcode.couponlab.user.internal.security;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
 import java.time.Clock;
 import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenIssuer {
 
     public static final String ROLE_CLAIM = "role";
@@ -18,12 +20,6 @@ public class JwtTokenIssuer {
     private final JwtEncoder jwtEncoder;
     private final AuthProperties authProperties;
     private final Clock clock;
-
-    JwtTokenIssuer(JwtEncoder jwtEncoder, AuthProperties authProperties, Clock clock) {
-        this.jwtEncoder = jwtEncoder;
-        this.authProperties = authProperties;
-        this.clock = clock;
-    }
 
     public IssuedToken issue(User user) {
         Instant now = clock.instant();

@@ -10,9 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     public static final int MAX_PROVIDER_USER_ID_LENGTH = 64;
@@ -33,9 +38,6 @@ public class User {
     private Role role;
 
     private Instant createdAt;
-
-    protected User() {
-    }
 
     private User(AuthProvider authProvider, String providerUserId, String nickname, Role role, Instant createdAt) {
         this.authProvider = authProvider;
@@ -62,17 +64,5 @@ public class User {
         if (value.length() > maxLength) {
             throw new IllegalArgumentException(name + " must be at most " + maxLength + " characters");
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public Role getRole() {
-        return role;
     }
 }

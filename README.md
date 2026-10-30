@@ -44,6 +44,7 @@
 - [ADR-0006 1단계 스키마](docs/decisions/ADR-0006-schema-v1.md): 코드 테이블로 당첨 표현, 불변식의 DB 제약, 코드 암호화·해시 분리, 코드 등록은 오픈 전만 (채택)
 - [ADR-0007 인증](docs/decisions/ADR-0007-authentication.md): 무상태 JWT, 실험용 토큰 발급(experiment 프로필), 동시 첫 로그인 처리 (채택)
 - [ADR-0008 패키지 구조](docs/decisions/ADR-0008-package-structure.md): 모듈은 기능 단위, 모듈 안은 web·application·domain 역할 단위 (채택)
+- [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
 
 ## 실행 방법
 

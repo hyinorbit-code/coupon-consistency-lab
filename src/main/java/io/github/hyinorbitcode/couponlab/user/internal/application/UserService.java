@@ -5,19 +5,16 @@ import io.github.hyinorbitcode.couponlab.user.internal.domain.AuthProvider;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.UserRepository;
 import java.time.Clock;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final Clock clock;
-
-    UserService(UserRepository userRepository, Clock clock) {
-        this.userRepository = userRepository;
-        this.clock = clock;
-    }
 
     /**
      * 같은 인증 제공자·식별자의 사용자가 있으면 그대로 반환하고, 없으면 만든다.

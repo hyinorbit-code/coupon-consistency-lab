@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,15 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("experiment")
 @RestController
 @RequestMapping("/experiment/auth")
+@RequiredArgsConstructor
 class ExperimentAuthController {
 
     private final UserService userService;
     private final JwtTokenIssuer jwtTokenIssuer;
-
-    ExperimentAuthController(UserService userService, JwtTokenIssuer jwtTokenIssuer) {
-        this.userService = userService;
-        this.jwtTokenIssuer = jwtTokenIssuer;
-    }
 
     @PostMapping("/token")
     TokenResponse issueToken(@Valid @RequestBody TokenRequest request) {
