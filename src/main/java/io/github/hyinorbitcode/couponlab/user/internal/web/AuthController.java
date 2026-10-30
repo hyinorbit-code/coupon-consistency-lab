@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 이메일 회원가입과 인증(ADR-0012). 가입·재발송은 계정 존재 여부와 관계없이 같은 202 응답을 준다.
+ * 로그인 전 사용자가 쓰는 인증 절차 API(/api/auth/**, 인증 불필요). 컨트롤러는 URL 단위로 묶고
+ * 로직은 유스케이스별 서비스에 둔다(ADR-0008). 가입·재발송은 계정 존재 여부와 관계없이 같은 202 응답을 준다(ADR-0012).
  */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-class SignupController {
+class AuthController {
 
     private static final MessageResponse CHECK_YOUR_MAIL =
             new MessageResponse("입력한 이메일로 안내 메일을 보냈습니다. 메일함을 확인해 주세요.");

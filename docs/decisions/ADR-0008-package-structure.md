@@ -2,6 +2,7 @@
 
 작성일: 2026-10-30
 상태: 채택
+보강: 2026-10-30 컨트롤러·서비스 분리 기준 추가
 
 ## 맥락
 
@@ -33,6 +34,7 @@
 | `domain` | 규칙 자체 | 다른 역할 패키지를 참조하지 않는다 |
 
 - 컨트롤러는 리포지토리를 직접 쓰지 않고 `application` 서비스를 거친다.
+- **컨트롤러는 URL·리소스 단위, 서비스는 유스케이스 단위로 나눈다.** 컨트롤러는 HTTP 입출력만 하는 얇은 계층이라 URL 구조를 따라 묶고(예: `/api/auth/**` → `AuthController`, `/api/users/**` → `UserController`), 로직이 들어가는 서비스는 유스케이스별로 나눈다(예: `SignupService`, `EmailVerificationService`). URL 경계는 보안 규칙(인증 필요 여부)과도 맞춘다. 프로필처럼 클래스 단위로 붙는 조건이 다른 엔드포인트는 별도 컨트롤러로 둔다(예: `ExperimentAuthController`). 한 컨트롤러가 지나치게 커지면 성격이 다른 부분만 떼어 낸다(예: 나중에 카카오 OAuth 콜백).
 - 한 클래스는 한 역할만 한다. 예: 인자 리졸버와 그것을 MVC에 등록하는 설정은 별도 클래스(`CurrentUserArgumentResolver`, `UserWebMvcConfig`).
 
 ### 3. 접근 제어
