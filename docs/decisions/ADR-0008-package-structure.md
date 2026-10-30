@@ -3,6 +3,7 @@
 작성일: 2026-10-30
 상태: 채택
 보강: 2026-10-30 컨트롤러·서비스 분리 기준 추가
+보강: 2026-10-30 웹 DTO를 web/dto 패키지로 분리, 역할 패키지 의존 방향을 ArchUnit으로 검사
 
 ## 맥락
 
@@ -36,6 +37,7 @@
 - 컨트롤러는 리포지토리를 직접 쓰지 않고 `application` 서비스를 거친다.
 - **컨트롤러는 URL·리소스 단위, 서비스는 유스케이스 단위로 나눈다.** 컨트롤러는 HTTP 입출력만 하는 얇은 계층이라 URL 구조를 따라 묶고(예: `/api/auth/**` → `AuthController`, `/api/users/**` → `UserController`), 로직이 들어가는 서비스는 유스케이스별로 나눈다(예: `SignupService`, `EmailVerificationService`). URL 경계는 보안 규칙(인증 필요 여부)과도 맞춘다. 프로필처럼 클래스 단위로 붙는 조건이 다른 엔드포인트는 별도 컨트롤러로 둔다(예: `ExperimentAuthController`). 한 컨트롤러가 지나치게 커지면 성격이 다른 부분만 떼어 낸다(예: 나중에 카카오 OAuth 콜백).
 - 한 클래스는 한 역할만 한다. 예: 인자 리졸버와 그것을 MVC에 등록하는 설정은 별도 클래스(`CurrentUserArgumentResolver`, `UserWebMvcConfig`).
+- **웹 요청·응답 DTO는 `web/dto` 패키지에 클래스마다 별도 파일(record)로 둔다.** 이름은 `XxxRequest`, `XxxResponse`. 하위 패키지라 `public`이 되므로, `application`·`domain`이 `web`(DTO 포함)을 참조하지 못하게 `LayerDependencyTests`(ArchUnit)로 막는다. 서비스는 웹 DTO 대신 원시 값이나 `application`에 정의한 커맨드 객체를 받는다. 입력 정리(예: 이메일 앞뒤 공백 제거)처럼 검증 전에 필요한 처리는 DTO의 compact 생성자에 둔다.
 
 ### 3. 접근 제어
 
@@ -62,7 +64,16 @@
 - **모듈 안을 기능 단위로 다시 나눔(예: `user/internal/withdrawal`):** 모듈 안의 기능이 그만큼 커지면 모듈 분리가 더 명확한 해법이다.
 - **최상위를 계층 단위로 나눔(`controller/`, `service/`, `repository/`):** 기능 하나를 바꿀 때 여러 최상위 패키지를 오가야 하고, 모듈 경계를 검사할 수 없다.
 
+## DTO 위치를 정할 때 검토한 대안
+
+| 안 | 장단점 | 결정 |
+| --- | --- | --- |
+| 컨트롤러 안 중첩 record | 사용처 옆에 있어 읽기 쉽고 package-private 유지. 컨트롤러가 길어지고 공유가 어렵다 | 기각 |
+| **`web/dto` 별도 파일** | DTO를 모아 보기 쉽고 국내 실무에서 익숙한 구조. `public`이 강제된다 | **채택**. 노출 문제는 ArchUnit 테스트로 보완 |
+| `web` 패키지 별도 파일 | package-private 유지. `web` 패키지 파일이 늘어난다 | 기각 |
+
 ## 결과
 
 - `user` 모듈을 이 구조로 옮겼다. 컨트롤러의 리포지토리 직접 사용을 `UserService.get()`으로 바꾸고 `UserNotFoundException`(404)을 추가했다.
 - 테스트도 대상 클래스와 같은 하위 패키지에 둔다.
+- 모듈 간 경계는 Spring Modulith(`ModularityTests`), 모듈 안의 역할 패키지 방향(application·domain → web 금지, domain → application 금지)은 ArchUnit(`LayerDependencyTests`)이 검사한다.

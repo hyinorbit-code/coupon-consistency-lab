@@ -1,16 +1,12 @@
 package io.github.hyinorbitcode.couponlab.user.internal.web;
 
-import io.github.hyinorbitcode.couponlab.user.Role;
 import io.github.hyinorbitcode.couponlab.user.internal.application.UserService;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.IdentityProvider;
 import io.github.hyinorbitcode.couponlab.user.internal.domain.User;
-import io.github.hyinorbitcode.couponlab.user.internal.domain.UserIdentity;
 import io.github.hyinorbitcode.couponlab.user.internal.security.JwtTokenIssuer;
+import io.github.hyinorbitcode.couponlab.user.internal.web.dto.ExperimentTokenRequest;
+import io.github.hyinorbitcode.couponlab.user.internal.web.dto.TokenResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,19 +28,10 @@ class ExperimentAuthController {
     private final JwtTokenIssuer jwtTokenIssuer;
 
     @PostMapping("/token")
-    TokenResponse issueToken(@Valid @RequestBody TokenRequest request) {
+    TokenResponse issueToken(@Valid @RequestBody ExperimentTokenRequest request) {
         User user = userService.findOrCreate(
                 IdentityProvider.EXPERIMENT, request.providerUserId(), request.nickname(), request.role());
         JwtTokenIssuer.IssuedToken token = jwtTokenIssuer.issue(user);
         return new TokenResponse(token.accessToken(), token.expiresAt());
-    }
-
-    record TokenRequest(
-            @NotBlank @Size(max = UserIdentity.MAX_PROVIDER_USER_ID_LENGTH) String providerUserId,
-            @NotBlank @Size(max = User.MAX_NICKNAME_LENGTH) String nickname,
-            @NotNull Role role) {
-    }
-
-    record TokenResponse(String accessToken, Instant expiresAt) {
     }
 }
