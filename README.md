@@ -39,6 +39,7 @@
 - [ADR-0001 초기 기술 스택](docs/decisions/ADR-0001-initial-tech-stack.md): 언어·프레임워크, DB, 실행 환경·비용, 모듈 경계 (채택)
 - [ADR-0002 도메인 전환](docs/decisions/ADR-0002-domain-free-drop-event.md): 선착순 무료 드롭과 실전 이벤트 (채택)
 - [ADR-0003 업무 규칙](docs/decisions/ADR-0003-business-rules.md): 참여 제한, 선착순 판정, 코드 할당, 시간, 코드 보관, 권한, 불변식 (채택)
+- [ADR-0004 테스트 전략](docs/decisions/ADR-0004-test-strategy.md): 테스트 계층, 동시성 테스트, 실행·격리, 커버리지 기준 (채택)
 
 ## 실행 방법
 
