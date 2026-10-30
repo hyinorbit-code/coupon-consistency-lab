@@ -1,0 +1,16 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+.idea/
+.vscode/
+.gradle/
+build/
+target/
+*.log
+# Large local experiment output; commit curated summaries separately
+work/
+results/raw/
