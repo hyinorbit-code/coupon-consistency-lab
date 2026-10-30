@@ -14,7 +14,7 @@
 | 성능 | 오픈 시각의 순간 피크와 남은 수량 조회 폭주에서 병목은 어디이며, 변경 전후가 동일 조건에서 수치로 어떻게 달라지는가? |
 | 장애 복구 | 처리 중 종료·중복 전달·컨슈머 중단 이후에도 당첨과 코드 할당이 정확히 한 번만 반영되는가? |
 
-세 사례의 결론은 실전 이벤트(카카오 로그인, 회차당 커피 쿠폰 10매)에서 실제 트래픽으로 검증합니다.
+세 사례의 결론은 실전 이벤트(회차당 커피 쿠폰 10매)에서 실제 트래픽으로 검증합니다. 로그인은 이메일(인증)과 카카오로 할 수 있고, 응모는 카카오 계정이 연동된 사용자만 카카오 계정당 1회 할 수 있습니다.
 
 ## 진행 방식
 
@@ -45,6 +45,7 @@
 - [ADR-0007 인증](docs/decisions/ADR-0007-authentication.md): 무상태 JWT, 실험용 토큰 발급(experiment 프로필), 동시 첫 로그인 처리 (채택)
 - [ADR-0008 패키지 구조](docs/decisions/ADR-0008-package-structure.md): 모듈은 기능 단위, 모듈 안은 web·application·domain 역할 단위 (채택)
 - [ADR-0009 Lombok 사용 규칙](docs/decisions/ADR-0009-lombok.md): 빈은 `@RequiredArgsConstructor`, 엔티티는 `@Getter`·보호된 기본 생성자, `@Data`·`@Setter` 등은 컴파일 오류 (채택)
+- [ADR-0010 로그인 수단과 응모 자격](docs/decisions/ADR-0010-login-methods-and-eligibility.md): 이메일(인증)·카카오 로그인, 응모는 카카오 연동 사용자만 (채택)
 
 ## 실행 방법
 
