@@ -6,7 +6,7 @@
 
 0단계(규칙·기반 결정) 완료, 1단계 구현 전입니다. 문서의 수치와 시나리오는 계획이며 실적이 아닙니다.
 
-2026-11-02에 백엔드 로직을 모두 지우고 직접 다시 구현하는 중입니다. 남은 것은 모듈 패키지 골격, DB 마이그레이션(V1·V2), 테스트 인프라(Testcontainers, 모듈·계층 의존 검사, 스키마 제약 테스트)입니다. 지우기 전의 구현(회원가입·이메일 인증, JWT, 실험용 토큰, 전역 오류 처리)은 참고용으로 [`reference/v0`](https://github.com/hyinorbit-code/coupon-consistency-lab/tree/reference/v0) 브랜치에 있습니다. ADR은 설계 결정이므로 그대로 두며, 다시 구현할 때 기준으로 삼습니다.
+2026-11-02에 백엔드 로직을 모두 지우고 직접 다시 구현하는 중입니다. 테스트 코드도 모두 지웠습니다. 남은 것은 모듈 패키지 골격, DB 마이그레이션(V1·V2), 빌드 설정입니다. 지우기 전의 구현(회원가입·이메일 인증, JWT, 실험용 토큰, 전역 오류 처리, Testcontainers 테스트 인프라와 테스트 72개)은 참고용으로 [`reference/v0`](https://github.com/hyinorbit-code/coupon-consistency-lab/tree/reference/v0) 브랜치에 있습니다. ADR은 설계 결정이므로 그대로 두며, 다시 구현할 때 기준으로 삼습니다.
 
 ## 핵심 질문
 
@@ -64,6 +64,8 @@
 ./gradlew check            # 전체
 ./gradlew bootTestRun      # Testcontainers MySQL·Mailpit과 함께 로컬 실행 (test·experiment 프로필)
 ```
+
+재구현 중이라 지금은 테스트가 없고, `bootTestRun`은 진입점(`TestCouponLabApplication`)을 다시 만들어야 동작합니다.
 
 `bootTestRun`은 시작할 때 Mailpit 웹 화면 주소를 콘솔에 출력합니다. 메일 발송을 다시 구현하면 그 화면에서 확인합니다.
 
