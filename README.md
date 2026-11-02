@@ -4,7 +4,9 @@
 
 ## 현재 상태
 
-0단계(규칙·기반 결정) 완료, 1단계 구현 전입니다(2026-10-30). 프로젝트 골격과 기반 테스트만 있고 업무 기능과 실험 결과는 아직 없습니다. 문서의 수치와 시나리오는 계획이며 실적이 아닙니다.
+0단계(규칙·기반 결정) 완료, 1단계 구현 전입니다. 문서의 수치와 시나리오는 계획이며 실적이 아닙니다.
+
+2026-11-02에 백엔드 로직을 모두 지우고 직접 다시 구현하는 중입니다. 남은 것은 모듈 패키지 골격, DB 마이그레이션(V1·V2), 테스트 인프라(Testcontainers, 모듈·계층 의존 검사, 스키마 제약 테스트)입니다. 지우기 전의 구현(회원가입·이메일 인증, JWT, 실험용 토큰, 전역 오류 처리)은 참고용으로 [`reference/v0`](https://github.com/hyinorbit-code/coupon-consistency-lab/tree/reference/v0) 브랜치에 있습니다. ADR은 설계 결정이므로 그대로 두며, 다시 구현할 때 기준으로 삼습니다.
 
 ## 핵심 질문
 
@@ -63,16 +65,7 @@
 ./gradlew bootTestRun      # Testcontainers MySQL·Mailpit과 함께 로컬 실행 (test·experiment 프로필)
 ```
 
-로컬 실행 중 실험용 토큰 발급과 내 정보 조회:
-
-```bash
-TOKEN=$(curl -s -X POST localhost:8080/api/experiment/auth/token \
-  -H 'Content-Type: application/json' \
-  -d '{"providerUserId":"user-1","nickname":"tester","role":"USER"}' | jq -r .accessToken)
-curl -s localhost:8080/api/users/me -H "Authorization: Bearer $TOKEN"
-```
-
-`bootTestRun`은 시작할 때 Mailpit 웹 화면 주소를 콘솔에 출력합니다. 회원가입 인증 메일은 그 화면에서 확인합니다.
+`bootTestRun`은 시작할 때 Mailpit 웹 화면 주소를 콘솔에 출력합니다. 메일 발송을 다시 구현하면 그 화면에서 확인합니다.
 
 실행 중인 MySQL에 접속하려면(데이터는 앱을 끄면 사라집니다):
 
@@ -80,9 +73,9 @@ curl -s localhost:8080/api/users/me -H "Authorization: Bearer $TOKEN"
 docker exec -it $(docker ps -q --filter ancestor=mysql:8.4 | head -1) mysql --default-character-set=utf8mb4 -utest -ptest test
 ```
 
-실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 있습니다(`/actuator` 제외).
+인증을 다시 구현하면 실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 둡니다(`/actuator` 제외, ADR-0013).
 
-프론트엔드(React + Tailwind)는 모든 화면이 만들어져 있고, 아직 백엔드에 없는 API는 목업(MSW)으로 동작합니다. 회원가입·이메일 인증은 실제 백엔드를 쓰므로 백엔드를 먼저 띄운 뒤 `frontend/`에서 실행합니다. 화면 오른쪽 아래 DEV 버튼으로 사용자 전환·응모 결과 등을 바꿀 수 있습니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
+프론트엔드(React + Tailwind)는 모든 화면이 만들어져 있고, 아직 백엔드에 없는 API는 목업(MSW)으로 동작합니다. 백엔드에 API가 생기는 대로 목업 대신 실제 백엔드를 쓰도록 바꿉니다. 화면 오른쪽 아래 DEV 버튼으로 사용자 전환·응모 결과 등을 바꿀 수 있습니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
 
 ```bash
 cd frontend && npm install && npm run dev   # http://localhost:5173, /api는 8080으로 프록시

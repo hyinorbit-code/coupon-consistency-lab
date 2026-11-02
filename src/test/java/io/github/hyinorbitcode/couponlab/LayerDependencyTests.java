@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * 도메인 모듈 안의 계층 의존 방향(ADR-0014). 모듈 간 경계는 Spring Modulith가, 모듈 안의 방향은 이 테스트가 검사한다.
  * 방향: controller → service → repository·entity. dto는 controller에서만, global은 어디서나 쓸 수 있다.
+ * 모든 모듈에 모든 계층이 있지는 않으므로, 검사 대상 클래스가 없어도 통과한다(allowEmptyShould).
  */
 class LayerDependencyTests {
 
@@ -23,6 +24,7 @@ class LayerDependencyTests {
     void onlyControllersUseControllersAndDtos() {
         noClasses().that().resideOutsideOfPackages("..controller..", "..dto..")
                 .should().dependOnClassesThat().resideInAnyPackage("..controller..", "..dto..")
+                .allowEmptyShould(true)
                 .check(CLASSES);
     }
 
@@ -31,6 +33,7 @@ class LayerDependencyTests {
     void persistenceDoesNotDependOnServices() {
         noClasses().that().resideInAnyPackage("..entity..", "..repository..")
                 .should().dependOnClassesThat().resideInAPackage("..service..")
+                .allowEmptyShould(true)
                 .check(CLASSES);
     }
 
@@ -39,6 +42,7 @@ class LayerDependencyTests {
     void entitiesDoNotDependOnRepositories() {
         noClasses().that().resideInAPackage("..entity..")
                 .should().dependOnClassesThat().resideInAPackage("..repository..")
+                .allowEmptyShould(true)
                 .check(CLASSES);
     }
 
@@ -49,6 +53,7 @@ class LayerDependencyTests {
                 .should().dependOnClassesThat()
                 .resideInAnyPackage("..couponlab.user..", "..couponlab.drop..", "..couponlab.prizecode..",
                         "..couponlab.participation..")
+                .allowEmptyShould(true)
                 .check(CLASSES);
     }
 }
