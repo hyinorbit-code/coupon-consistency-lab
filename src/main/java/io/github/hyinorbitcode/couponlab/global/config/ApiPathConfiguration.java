@@ -15,5 +15,5 @@ public class ApiPathConfiguration implements WebMvcConfigurer {
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.addPathPrefix(API_PREFIX, HandlerTypePredicate.forAnnotation(RestController.class));
     }
-    
+
 }
