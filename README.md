@@ -83,14 +83,24 @@
 ./gradlew test             # 단위·통합 테스트
 ./gradlew concurrencyTest  # 동시성 테스트 ("concurrency" 태그)
 ./gradlew check            # 전체
-./gradlew bootTestRun      # Testcontainers MySQL·Mailpit과 함께 로컬 실행 (test·experiment 프로필)
+./gradlew bootTestRun      # Testcontainers MySQL과 함께 로컬 실행 (test·experiment 프로필)
 ```
+
+로컬 실행 중에는 실험용 토큰 발급 API로 토큰을 받아 다른 API를 호출할 수 있습니다. 이 API는 experiment 프로필에서만 존재합니다(ADR-0007).
+
+```bash
+curl -s -X POST localhost:8080/api/experiment/auth/token \
+  -H 'Content-Type: application/json' \
+  -d '{"providerUserId":"u-1","nickname":"tester","role":"USER"}'
+```
+
+로컬 실행 중 MySQL 컨테이너에 접속하려면:
 
 ```bash
 docker exec -it $(docker ps -q --filter ancestor=mysql:8.4 | head -1) mysql --default-character-set=utf8mb4 -utest -ptest test
 ```
 
-인증을 다시 구현하면 실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 둡니다(`/actuator` 제외, ADR-0013).
+실제 환경에서는 `COUPONLAB_AUTH_JWT_SECRET`(32바이트 이상)을 환경변수로 주입해야 기동합니다. 모든 API는 `/api` 아래에 둡니다(`/actuator` 제외, ADR-0013).
 
 프론트엔드(React + Tailwind)는 모든 화면이 만들어져 있고, 아직 백엔드에 없는 API는 목업(MSW)으로 동작합니다. 백엔드에 API가 생기는 대로 목업 대신 실제 백엔드를 쓰도록 바꿉니다. 화면 오른쪽 아래 DEV 버튼으로 사용자 전환·응모 결과 등을 바꿀 수 있습니다. 자세한 내용은 [frontend/README.md](frontend/README.md)를 참고하세요.
 
