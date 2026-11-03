@@ -22,7 +22,7 @@ class UserIdentityTests {
     }
 
     @Test
-    @DisplayName("외부 계정을 연동하면 전달한 사용자·제공자·식별자·시각을 가진다")
+    @DisplayName("외부 계정을 연동하면 전달한 사용자, 제공자, 식별자, 시각을 가진다")
     void linkIdentity(){
 
         User user = newUser();
@@ -72,7 +72,7 @@ class UserIdentityTests {
     }
 
     @Test
-    @DisplayName("사용자·제공자·시각이 없으면 연동할 수 없다")
+    @DisplayName("사용자, 제공자, 시각이 없으면 연동할 수 없다")
     void rejectsNullArguments() {
         User user = newUser();
 
