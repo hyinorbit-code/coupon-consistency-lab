@@ -7,6 +7,7 @@ public class TestCouponLabApplication {
     public static void main(String[] args) {
         SpringApplication.from(CouponLabApplication::main)
                 .with(TestcontainersConfiguration.class)
+                .withAdditionalProfiles("test")
                 .run(args);
     }
     
