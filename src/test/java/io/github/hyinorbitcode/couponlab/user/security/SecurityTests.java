@@ -1,14 +1,12 @@
 package io.github.hyinorbitcode.couponlab.user.security;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import io.github.hyinorbitcode.couponlab.TestcontainersConfiguration;
+import io.github.hyinorbitcode.couponlab.IntegrationTest;
 import io.github.hyinorbitcode.couponlab.user.Role;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,7 +14,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +33,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Import({TestcontainersConfiguration.class, SecurityTests.SecurityTestController.class})
+@IntegrationTest
+@Import(SecurityTests.SecurityTestController.class)
 class SecurityTests {
 
     private static final String ME = "/api/security-test/me";
