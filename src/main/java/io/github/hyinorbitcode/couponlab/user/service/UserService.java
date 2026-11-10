@@ -4,6 +4,7 @@ import io.github.hyinorbitcode.couponlab.user.Role;
 import io.github.hyinorbitcode.couponlab.user.entity.IdentityProvider;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import io.github.hyinorbitcode.couponlab.user.entity.UserIdentity;
+import io.github.hyinorbitcode.couponlab.user.exception.UserNotFoundException;
 import io.github.hyinorbitcode.couponlab.user.repository.UserIdentityRepository;
 import io.github.hyinorbitcode.couponlab.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,4 +48,10 @@ public class UserService {
         return userIdentityRepository.findByProviderAndProviderUserId(provider, providerUserId)
                 .map(UserIdentity::getUser);
     }
+
+    public User get(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
 }
