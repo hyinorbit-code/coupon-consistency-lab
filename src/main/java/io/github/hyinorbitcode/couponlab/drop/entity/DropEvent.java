@@ -82,4 +82,8 @@ public class DropEvent {
         return DropPhase.CLOSED;
     }
 
+    public boolean canRegisterCodes(Instant now) {
+        return status != DropEventStatus.CANCELED && now.isBefore(openAt);
+    }
+
 }

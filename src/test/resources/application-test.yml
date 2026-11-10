@@ -2,3 +2,6 @@
 couponlab:
   auth:
     jwt-secret: test-only-secret-key-for-local-and-ci-0123456789
+  prize-code:
+    encryption-key: N5zoFPlUY7BWqpNMFJudPzfZAyEDB7qoQrmcUn5KrVc=
+    hash-key: 9NsysCB0jcwBRW6281OrNGkULyhbA3cM0lzRUvVa8uM=

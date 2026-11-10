@@ -1,6 +1,8 @@
 package io.github.hyinorbitcode.couponlab.drop.service;
 
+import io.github.hyinorbitcode.couponlab.drop.DropEventApi;
 import io.github.hyinorbitcode.couponlab.drop.entity.DropEvent;
+import io.github.hyinorbitcode.couponlab.drop.exception.CodesLockedException;
 import io.github.hyinorbitcode.couponlab.drop.exception.DropNotFoundException;
 import io.github.hyinorbitcode.couponlab.drop.repository.DropEventRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
-public class DropService {
+public class DropService implements DropEventApi {
 
     private final DropEventRepository dropEventRepository;
     private final Clock clock;
@@ -27,6 +29,15 @@ public class DropService {
     public DropEvent getForAdmin(long id) {
         return dropEventRepository.findById(id)
                 .orElseThrow(DropNotFoundException::new);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void checkCodesRegistrable(long dropEventId) {
+        DropEvent event = getForAdmin(dropEventId);
+        if (!event.canRegisterCodes(clock.instant())) {
+            throw new CodesLockedException();
+        }
     }
 
 }

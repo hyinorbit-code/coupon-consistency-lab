@@ -24,6 +24,10 @@ couponlab:
     jwt-secret: ${COUPONLAB_AUTH_JWT_SECRET:}
     issuer: coupon-consistency-lab
     token-ttl: 24h
+  prize-code:
+    # 각각 32바이트 base64. 저장소에 넣지 않고 환경변수로 주입한다(ADR-0006).
+    encryption-key: ${COUPONLAB_PRIZE_CODE_ENCRYPTION_KEY:}
+    hash-key: ${COUPONLAB_PRIZE_CODE_HASH_KEY:}
   signup:
     verification-ttl: 24h
     resend-interval: 1m

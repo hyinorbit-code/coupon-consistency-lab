@@ -189,6 +189,41 @@ class DropEventTests {
         );
     }
 
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("codeRegistrationBoundaries")
+    @DisplayName("코드는 오픈 전까지만 등록할 수 있다")
+    void codesRegistrableOnlyBeforeOpen(String description, Instant now, boolean expected) {
+        DropEvent event = draft();
+
+        assertThat(event.canRegisterCodes(now)).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> codeRegistrationBoundaries() {
+        return Stream.of(
+                Arguments.of("오픈 1나노초 전이면 등록 가능", OPEN_AT.minusNanos(1), true),
+                Arguments.of("정확히 오픈 시각이면 등록 불가", OPEN_AT, false),
+                Arguments.of("종료 시각이면 등록 불가", CLOSE_AT, false)
+        );
+    }
+
+    @Test
+    @DisplayName("공개했지만 오픈 전인 이벤트에는 코드를 등록할 수 있다")
+    void codesRegistrableWhenPublishedBeforeOpen() {
+        DropEvent event = draft();
+        event.publish();
+
+        assertThat(event.canRegisterCodes(NOW)).isTrue();
+    }
+
+    @Test
+    @DisplayName("취소한 이벤트에는 오픈 전이라도 코드를 등록할 수 없다")
+    void codesNotRegistrableWhenCanceled() {
+        DropEvent event = draft();
+        event.cancel();
+
+        assertThat(event.canRegisterCodes(NOW)).isFalse();
+    }
+
     private static DropEvent draft() {
         return DropEvent.create("커피 드롭", "아메리카노 쿠폰", OPEN_AT, CLOSE_AT, NOW);
     }
