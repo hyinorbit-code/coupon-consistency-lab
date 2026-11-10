@@ -27,8 +27,6 @@ import java.time.Clock;
 @Configuration(proxyBeanMethods = false)
 class SecurityConfig {
 
-    static final String ROLE_CLAIM = "role";
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             JwtAuthenticationConverter jwtAuthenticationConverter,
@@ -68,7 +66,7 @@ class SecurityConfig {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName(ROLE_CLAIM);
+        authoritiesConverter.setAuthoritiesClaimName(JwtTokenIssuer.ROLE_CLAIM);
         authoritiesConverter.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();

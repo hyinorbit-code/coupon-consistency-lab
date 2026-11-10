@@ -18,6 +18,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtTokenIssuer {
 
+    public static final String ROLE_CLAIM = "role";
+
     private final JwtEncoder jwtEncoder;
     private final AuthProperties authProperties;
     private final Clock clock;
@@ -33,7 +35,7 @@ public class JwtTokenIssuer {
                 .subject(String.valueOf(user.getId()))
                 .issuedAt(now)
                 .expiresAt(expiresAt)
-                .claim(SecurityConfig.ROLE_CLAIM, user.getRole().name())
+                .claim(ROLE_CLAIM, user.getRole().name())
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
 
