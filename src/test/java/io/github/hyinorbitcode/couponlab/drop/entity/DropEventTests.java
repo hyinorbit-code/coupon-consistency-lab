@@ -1,5 +1,6 @@
 package io.github.hyinorbitcode.couponlab.drop.entity;
 
+import io.github.hyinorbitcode.couponlab.drop.exception.InvalidDropStatusException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -113,7 +114,7 @@ class DropEventTests {
     void publishDraft() {
         DropEvent event = draft();
 
-        event.publish();
+        event.publish(NOW);
 
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.PUBLISHED);
     }
@@ -122,10 +123,10 @@ class DropEventTests {
     @DisplayName("이미 공개한 이벤트는 다시 공개할 수 없다")
     void rejectsPublishingTwice() {
         DropEvent event = draft();
-        event.publish();
+        event.publish(NOW);
 
-        assertThatThrownBy(event::publish)
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> event.publish(NOW))
+                .isInstanceOf(InvalidDropStatusException.class);
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.PUBLISHED);
     }
 
@@ -133,10 +134,10 @@ class DropEventTests {
     @DisplayName("취소한 이벤트는 공개할 수 없다")
     void rejectsPublishingCanceled() {
         DropEvent event = draft();
-        event.cancel();
+        event.cancel(NOW);
 
-        assertThatThrownBy(event::publish)
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> event.publish(NOW))
+                .isInstanceOf(InvalidDropStatusException.class);
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.CANCELED);
     }
 
@@ -145,7 +146,7 @@ class DropEventTests {
     void cancelDraft() {
         DropEvent event = draft();
 
-        event.cancel();
+        event.cancel(NOW);
 
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.CANCELED);
     }
@@ -154,9 +155,9 @@ class DropEventTests {
     @DisplayName("공개한 이벤트는 취소할 수 있다")
     void cancelPublished() {
         DropEvent event = draft();
-        event.publish();
+        event.publish(NOW);
 
-        event.cancel();
+        event.cancel(NOW);
 
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.CANCELED);
     }
@@ -165,10 +166,10 @@ class DropEventTests {
     @DisplayName("이미 취소한 이벤트는 다시 취소할 수 없다")
     void rejectsCancelingTwice() {
         DropEvent event = draft();
-        event.cancel();
+        event.cancel(NOW);
 
-        assertThatThrownBy(event::cancel)
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> event.cancel(NOW))
+                .isInstanceOf(InvalidDropStatusException.class);
     }
 
     @ParameterizedTest(name = "{0}")
@@ -210,7 +211,7 @@ class DropEventTests {
     @DisplayName("공개했지만 오픈 전인 이벤트에는 코드를 등록할 수 있다")
     void codesRegistrableWhenPublishedBeforeOpen() {
         DropEvent event = draft();
-        event.publish();
+        event.publish(NOW);
 
         assertThat(event.canRegisterCodes(NOW)).isTrue();
     }
@@ -219,9 +220,48 @@ class DropEventTests {
     @DisplayName("취소한 이벤트에는 오픈 전이라도 코드를 등록할 수 없다")
     void codesNotRegistrableWhenCanceled() {
         DropEvent event = draft();
-        event.cancel();
+        event.cancel(NOW);
 
         assertThat(event.canRegisterCodes(NOW)).isFalse();
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("statusChangeBoundaries")
+    @DisplayName("공개와 취소는 오픈 전까지만 할 수 있다")
+    void statusChangesOnlyBeforeOpen(String description, Instant now, boolean allowed) {
+        DropEvent toPublish = draft();
+        DropEvent toCancel = draft();
+
+        if (allowed) {
+            toPublish.publish(now);
+            toCancel.cancel(now);
+            assertThat(toPublish.getStatus()).isEqualTo(DropEventStatus.PUBLISHED);
+            assertThat(toCancel.getStatus()).isEqualTo(DropEventStatus.CANCELED);
+        } else {
+            assertThatThrownBy(() -> toPublish.publish(now)).isInstanceOf(InvalidDropStatusException.class);
+            assertThatThrownBy(() -> toCancel.cancel(now)).isInstanceOf(InvalidDropStatusException.class);
+            assertThat(toPublish.getStatus()).isEqualTo(DropEventStatus.DRAFT);
+            assertThat(toCancel.getStatus()).isEqualTo(DropEventStatus.DRAFT);
+        }
+    }
+
+    static Stream<Arguments> statusChangeBoundaries() {
+        return Stream.of(
+                Arguments.of("오픈 1나노초 전이면 가능", OPEN_AT.minusNanos(1), true),
+                Arguments.of("정확히 오픈 시각이면 불가", OPEN_AT, false),
+                Arguments.of("종료 시각이면 불가", CLOSE_AT, false)
+        );
+    }
+
+    @Test
+    @DisplayName("공개한 이벤트도 오픈 시각이 지나면 취소할 수 없다")
+    void rejectsCancelingPublishedAfterOpen() {
+        DropEvent event = draft();
+        event.publish(NOW);
+
+        assertThatThrownBy(() -> event.cancel(OPEN_AT))
+                .isInstanceOf(InvalidDropStatusException.class);
+        assertThat(event.getStatus()).isEqualTo(DropEventStatus.PUBLISHED);
     }
 
     private static DropEvent draft() {

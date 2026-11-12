@@ -1,5 +1,6 @@
 package io.github.hyinorbitcode.couponlab.drop.entity;
 
+import io.github.hyinorbitcode.couponlab.drop.exception.InvalidDropStatusException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -62,16 +63,16 @@ public class DropEvent {
         }
     }
 
-    public void publish() {
-        if (status != DropEventStatus.DRAFT) {
-            throw new IllegalStateException("only DRAFT can be published: " + status);
+    public void publish(Instant now) {
+        if (status != DropEventStatus.DRAFT || !now.isBefore(openAt)) {
+            throw new InvalidDropStatusException();
         }
         status = DropEventStatus.PUBLISHED;
     }
 
-    public void cancel() {
-        if (status == DropEventStatus.CANCELED) {
-            throw new IllegalStateException("already canceled");
+    public void cancel(Instant now) {
+        if (status == DropEventStatus.CANCELED || !now.isBefore(openAt)) {
+            throw new InvalidDropStatusException();
         }
         status = DropEventStatus.CANCELED;
     }

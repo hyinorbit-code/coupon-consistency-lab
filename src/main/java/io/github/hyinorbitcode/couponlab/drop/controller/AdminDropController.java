@@ -32,4 +32,13 @@ class AdminDropController {
         return AdminDropResponse.from(dropService.getForAdmin(id), clock.instant());
     }
 
+    @PostMapping("/{id}/publish")
+    AdminDropResponse publish(@PathVariable long id) {
+        return AdminDropResponse.from(dropService.publish(id), clock.instant());
+    }
+
+    @PostMapping("/{id}/cancel")
+    AdminDropResponse cancel(@PathVariable long id) {
+        return AdminDropResponse.from(dropService.cancel(id), clock.instant());
+    }
 }
