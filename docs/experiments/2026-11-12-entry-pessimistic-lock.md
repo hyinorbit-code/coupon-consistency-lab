@@ -51,7 +51,11 @@
 2. **처리량이 오히려 조금 올랐다 (약 15~20%).** 잠금 없는 방식은 매진 전까지 훨씬 많은 요청이 "당첨"으로 처리되며 UPDATE를 일으켰다. 같은 행에 몰린 UPDATE들이 서로의 행 잠금을 기다렸다. 비관적 락은 매진이 빨리 확정되고, 매진 응답은 쓰기 없이 끝나서 전체 작업량이 줄었다.
 3. **꼬리 지연(p95·p99)은 비슷하다.** 맨 앞 미할당 행에 줄을 서는 구조라, 코드가 남아 있는 동안의 요청은 차례로 처리된다. 커넥션 10개 제한도 꼬리 지연에 영향을 준다.
 4. **새 문제: 데드락.** 1,000~5,000건마다 6~15건(약 0.1~1.5%)이 `Deadlock found when trying to get lock`으로 실패했다.
-   - 원인(추정): `FOR UPDATE`가 `(drop_event_id, assigned_user_id, id)` 인덱스 범위에 넥스트키 락을 건다. 할당하면서 인덱스 컬럼인 `assigned_user_id`가 바뀌어 인덱스 레코드가 이동한다. 그래서 잠금을 잡는 순서가 트랜잭션마다 엇갈린다. 정확한 잠금 순서는 `SHOW ENGINE INNODB STATUS`로 확인해야 한다.
+   - 원인(`SHOW ENGINE INNODB STATUS`의 LATEST DETECTED DEADLOCK으로 확인): 같은 코드 행(id 7)의 잠금을 두 트랜잭션이 **서로 다른 순서**로 잡았다.
+     - 트랜잭션 1: 코드 7의 **기본키(PRIMARY) 레코드**에 X 락을 잡고 할당 UPDATE를 실행했다. UPDATE는 `assigned_user_id`를 NULL에서 14로 바꾸므로, 이 컬럼이 들어 있는 보조 인덱스 `fk_prize_codes_assigned_user`의 `(NULL, 7)` 레코드에도 X 락이 필요해 기다렸다.
+     - 트랜잭션 2: `assigned_user_id IS NULL` 조회를 **`fk_prize_codes_assigned_user` 인덱스로** 수행하며 `(NULL, 7)`에 X 락(넥스트키)을 먼저 잡았고, 이어서 기본키 레코드 7을 잠그려다 트랜잭션 1에 막혔다.
+     - 1은 "기본키 → 보조 인덱스", 2는 "보조 인덱스 → 기본키" 순서라 서로를 기다리는 원형 대기가 생겼고, InnoDB가 2를 롤백했다.
+   - `fk_prize_codes_assigned_user`는 외래키(`assigned_user_id → users.id`)를 위해 MySQL이 자동으로 만든 인덱스다. `uk_prize_codes_winner (drop_event_id, assigned_user_id)`는 `assigned_user_id`가 맨 앞이 아니라 외래키용으로 쓰이지 못했다. 그 결과 `assigned_user_id`를 담은 인덱스가 세 개(`uk_prize_codes_winner`, `ix_prize_codes_available`, `fk_prize_codes_assigned_user`)가 됐고, 옵티마이저가 같은 조회에 어떤 인덱스를 쓰느냐에 따라 잠금 순서가 달라질 수 있다.
    - 영향: 데이터는 틀리지 않는다(롤백된다). 하지만 해당 사용자는 당첨도 매진도 아닌 오류(현재 500)를 받는다. 코드가 남아 있는데 데드락으로 기회를 잃는 사용자가 생길 수 있다.
 5. **Hibernate가 모든 컬럼을 UPDATE한다.** 할당 시 `code_ciphertext`, `code_hash`까지 다시 쓴다(`@DynamicUpdate` 없음). 잠금 구간과 쓰기 양을 늘리는 요인이다.
 

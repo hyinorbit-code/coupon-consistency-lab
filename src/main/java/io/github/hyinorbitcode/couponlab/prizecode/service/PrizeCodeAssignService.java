@@ -32,7 +32,7 @@ public class PrizeCodeAssignService implements PrizeCodeAssigner {
     @Transactional
     public AssignedPrize assign(long dropEventId, long userId) {
         PrizeCode code = prizeCodeRepository
-                .findFirstForUpdateByDropEventIdAndAssignedUserIdIsNullOrderByIdAsc(dropEventId)
+                .findFirstAvailableForUpdateSkipLocked(dropEventId)
                 .orElseThrow(SoldOutException::new);
         code.assignTo(userId, clock.instant());
         return toAssignedPrize(code);
