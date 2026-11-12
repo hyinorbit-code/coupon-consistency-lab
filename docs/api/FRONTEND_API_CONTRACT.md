@@ -10,7 +10,7 @@
 - 모든 경로는 `/api` 아래에 있다(`ApiPathConfiguration`).
 - 시각은 ISO-8601 UTC 문자열이다. 화면이 한국 시간으로 바꿔 표시한다.
 - 인증은 `Authorization: Bearer <accessToken>`.
-- 오류는 ProblemDetail(RFC 9457)이며, **모든 오류 응답에 `code` 속성**이 붙는다(ADR-0013). 입력 검증 실패는 `errors: [{field, message}]`도 함께 온다.
+- 오류는 ProblemDetail(RFC 9457)이며, **모든 오류 응답에 `code` 속성**이 붙는다. 입력 검증 실패는 `errors: [{field, message}]`도 함께 온다.
 
 ```json
 { "type": "about:blank", "status": 409, "detail": "아쉽지만 준비된 경품이 모두 소진되었습니다.", "code": "SOLD_OUT" }
@@ -44,12 +44,12 @@
 | `INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호 불일치(계정 존재 여부를 구분하지 않음) |
 | `EMAIL_NOT_VERIFIED` | 403 | 이메일 인증 전 로그인 |
 | `ACCOUNT_LOCKED` | 423 | 로그인 실패 누적으로 잠김 |
-| `KAKAO_LINK_REQUIRED` | 403 | 카카오 미연동 사용자의 응모(ADR-0010) |
+| `KAKAO_LINK_REQUIRED` | 403 | 카카오 미연동 사용자의 응모 |
 | `KAKAO_ALREADY_LINKED` | 409 | 이미 카카오가 연동된 사용자 |
 | `DROP_NOT_OPEN` | 409 | 오픈 전 응모 |
 | `DROP_CLOSED` | 409 | 종료 후 응모 |
 | `SOLD_OUT` | 409 | 매진 |
-| `CODES_LOCKED` | 409 | 오픈 이후·취소된 이벤트에 코드 등록(ADR-0006) |
+| `CODES_LOCKED` | 409 | 오픈 이후·취소된 이벤트에 코드 등록 |
 | `NO_CODES` | 409 | 코드 없이 공개 시도 |
 
 ## 엔드포인트
@@ -85,7 +85,7 @@
 | POST | `/drops/{id}/entries` | 201 `{result: "WON", prize}`. 이미 당첨이면 200으로 같은 경품(멱등) | 목업 (1단계 핵심) |
 
 - `DropSummary = {id, title, prizeDescription, openAt, closeAt, totalQuantity, remainingQuantity, phase}`
-- `phase`: `UPCOMING`(오픈 전) · `OPEN` · `SOLD_OUT` · `CLOSED`. 서버가 DB 시각과 남은 수량으로 계산한다(ADR-0003).
+- `phase`: `UPCOMING`(오픈 전) · `OPEN` · `SOLD_OUT` · `CLOSED`. 서버가 DB 시각과 남은 수량으로 계산한다.
 - `Prize = {id, dropId, dropTitle, prizeDescription, code, wonAt}`. `code`는 복호화된 원문이며 본인에게만 준다.
 - 응모 처리 순서: 미인증 401 → 이미 당첨이면 그 경품 → 카카오 미연동 403 → 오픈 전·종료 409 → 할당(매진이면 409).
 
@@ -102,12 +102,12 @@
 
 - `AdminDropSummary = {id, title, status, phase, openAt, closeAt, registeredCodes, assignedCodes}`
 - `AdminDropDetail = AdminDropSummary + {prizeDescription, entryAttempts, winners: [{nickname, codeHint, assignedAt}]}`
-- `entryAttempts`는 매진 응답을 포함한 참여 시도 수로, DB가 아니라 메트릭에서 온다(ADR-0003).
+- `entryAttempts`는 매진 응답을 포함한 참여 시도 수로, DB가 아니라 메트릭에서 온다.
 - `codeHint`는 코드 끝 4자리. 관리자 화면에도 원문은 보내지 않는다.
 
 ## 목업에서 정한 화면 규칙(백엔드와 맞춰야 할 것)
 
-- 매진·종료 응답은 참여 기록을 남기지 않는다(ADR-0003). 목업은 `entryAttempts`만 올린다.
+- 매진·종료 응답은 참여 기록을 남기지 않는다. 목업은 `entryAttempts`만 올린다.
 - 코드 등록은 오픈 전에만 가능하고, 중복 코드는 제외하고 개수를 돌려준다.
 - 로그인 실패 5회면 15분 잠금(목업 값). 사용자 기능 2번에서 확정한다.
 - 카카오 로그인은 프론트가 인가 코드를 받아 `POST /auth/kakao/login`으로 넘기는 형태로 그렸다. Spring Security OAuth2 Client로 서버에서 콜백을 처리하게 되면 이 계약을 바꾼다(사용자 기능 4번).

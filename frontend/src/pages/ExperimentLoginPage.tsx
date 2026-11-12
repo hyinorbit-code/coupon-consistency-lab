@@ -8,7 +8,7 @@ import { Alert, Button, Card, Field } from '../components/ui'
 
 /**
  * 실제 백엔드의 실험용 토큰 발급(experiment 프로필)으로 로그인한다. 개발 패널에서만 들어온다.
- * 실험용 계정은 응모 자격을 인정받는다(ADR-0010).
+ * 실험용 계정은 응모 자격을 인정받는다.
  */
 export function ExperimentLoginPage() {
   const { signIn } = useAuth()

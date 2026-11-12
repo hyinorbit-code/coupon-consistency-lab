@@ -6,7 +6,7 @@ import { Button } from './ui'
 
 /**
  * 경품 코드 카드. 바코드와 코드 원문을 보여 주고 카카오톡으로 공유할 수 있다.
- * 공유는 사용자가 직접 보내는 카카오톡 공유 SDK를 쓴다(ADR-0002). 지금은 목업이다.
+ * 공유는 사용자가 직접 보내는 카카오톡 공유 SDK를 쓴다. 지금은 목업이다.
  */
 export function PrizeCard({ prize }: { prize: Prize }) {
   const [notice, setNotice] = useState<string | null>(null)

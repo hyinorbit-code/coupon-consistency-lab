@@ -8,7 +8,7 @@ import { safeNext } from '../lib/navigation'
 
 /**
  * 카카오 인가 후 돌아오는 화면. mode=login이면 카카오로 로그인(없으면 가입)하고,
- * mode=link면 로그인한 사용자에 카카오 계정을 연동한다(ADR-0010). 지금은 목업 API를 호출한다.
+ * mode=link면 로그인한 사용자에 카카오 계정을 연동한다. 지금은 목업 API를 호출한다.
  */
 export function KakaoCallbackPage() {
   const [searchParams] = useSearchParams()

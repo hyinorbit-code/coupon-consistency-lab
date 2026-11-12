@@ -8,7 +8,7 @@ type Result = { kind: 'pending' } | { kind: 'success'; message: string } | { kin
 
 /**
  * 메일 링크로 들어오는 페이지. 링크를 여는 것(GET)만으로는 인증되지 않고, 이 페이지가 POST로 토큰을 보낸다.
- * 메일 보안 스캐너가 링크를 미리 열어도 토큰이 소진되지 않게 하기 위해서다(ADR-0012).
+ * 메일 보안 스캐너가 링크를 미리 열어도 토큰이 소진되지 않게 하기 위해서다.
  */
 export function VerifyEmailPage() {
   const [searchParams] = useSearchParams()

@@ -21,7 +21,7 @@ const COMMON_CODES: Record<number, ErrorCode> = {
   500: 'INTERNAL_ERROR',
 }
 
-/** 백엔드처럼 모든 오류에 code를 붙인다(ADR-0013). 업무 코드가 없으면 상태에 맞는 공통 코드. */
+/** 백엔드처럼 모든 오류에 code를 붙인다. 업무 코드가 없으면 상태에 맞는 공통 코드. */
 function problem(status: number, detail: string, code?: ErrorCode) {
   return HttpResponse.json(
     { type: 'about:blank', status, detail, code: code ?? COMMON_CODES[status] ?? 'INTERNAL_ERROR' },
@@ -47,7 +47,7 @@ function issueToken(user: db.MockUser) {
 
 /**
  * 요청한 사용자를 찾는다. 목업 토큰이면 목업 사용자, 실제 백엔드가 발급한 실험용 JWT면 그 sub로
- * 목업 사용자를 만들어 쓴다(실험용 계정은 응모 자격을 인정한다, ADR-0010).
+ * 목업 사용자를 만들어 쓴다(실험용 계정은 응모 자격을 인정한다).
  */
 function currentUser(request: Request): db.MockUser | null {
   const token = bearer(request)

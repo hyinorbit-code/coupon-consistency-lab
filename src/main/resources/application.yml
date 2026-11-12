@@ -15,24 +15,24 @@ spring:
   web:
     resources:
       # 백엔드는 API만 제공한다(프론트는 CloudFront). 없는 경로가 정적 리소스 핸들러로 빠지지 않고
-      # 전역 예외 핸들러에서 404 ProblemDetail로 응답되게 한다(ADR-0013).
+      # 전역 예외 핸들러에서 404 ProblemDetail로 응답되게 한다.
       add-mappings: false
 
 couponlab:
   auth:
-    # 32바이트 이상. 저장소에 넣지 않고 환경변수로 주입한다(ADR-0007).
+    # 32바이트 이상. 저장소에 넣지 않고 환경변수로 주입한다.
     jwt-secret: ${COUPONLAB_AUTH_JWT_SECRET:}
     issuer: coupon-consistency-lab
     token-ttl: 24h
   prize-code:
-    # 각각 32바이트 base64. 저장소에 넣지 않고 환경변수로 주입한다(ADR-0006).
+    # 각각 32바이트 base64. 저장소에 넣지 않고 환경변수로 주입한다.
     encryption-key: ${COUPONLAB_PRIZE_CODE_ENCRYPTION_KEY:}
     hash-key: ${COUPONLAB_PRIZE_CODE_HASH_KEY:}
   signup:
     verification-ttl: 24h
     resend-interval: 1m
   web:
-    # 인증 메일 링크가 가리키는 프론트엔드 주소(ADR-0011)
+    # 인증 메일 링크가 가리키는 프론트엔드 주소
     base-url: ${COUPONLAB_WEB_BASE_URL:http://localhost:5173}
   mail:
     from: no-reply@coupon-lab.local

@@ -11,7 +11,7 @@ import type {
 
 /**
  * MSW가 쓰는 목 DB. 새로고침해도 유지되도록 localStorage에 저장하고, 개발 패널에서 초기화하면 처음 상태로 돌아간다.
- * 실제 백엔드 규칙(ADR-0003, ADR-0006, ADR-0010)을 흉내 낸다.
+ * 실제 백엔드 규칙을 흉내 낸다.
  */
 
 export type MockUser = {

@@ -8,7 +8,7 @@ export type Role = 'ADMIN' | 'USER'
 /** 사용자 화면에서 보는 이벤트 진행 단계. 시각과 남은 수량으로 서버가 계산한다. */
 export type DropPhase = 'UPCOMING' | 'OPEN' | 'SOLD_OUT' | 'CLOSED'
 
-/** 관리자가 다루는 이벤트 상태(ADR-0006). */
+/** 관리자가 다루는 이벤트 상태. */
 export type DropStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELED'
 
 export type DropSummary = {
@@ -38,7 +38,7 @@ export type Prize = {
   dropId: number
   dropTitle: string
   prizeDescription: string
-  /** 복호화된 경품 코드 원문. 당첨된 본인만 받는다(ADR-0003). */
+  /** 복호화된 경품 코드 원문. 당첨된 본인만 받는다. */
   code: string
   wonAt: string
 }
@@ -85,7 +85,7 @@ export type AdminWinner = {
 
 export type AdminDropDetail = AdminDropSummary & {
   prizeDescription: string
-  /** 참여 시도 수(매진 응답 포함). DB가 아니라 메트릭에서 온다(ADR-0003). */
+  /** 참여 시도 수(매진 응답 포함). DB가 아니라 메트릭에서 온다. */
   entryAttempts: number
   winners: AdminWinner[]
 }
@@ -95,7 +95,7 @@ export type CodeUploadResult = {
   duplicates: number
 }
 
-/** ProblemDetail(RFC 9457)에 붙는 오류 코드(ADR-0013). 공통 코드 + 모듈별 업무 코드. */
+/** ProblemDetail(RFC 9457)에 붙는 오류 코드. 공통 코드 + 모듈별 업무 코드. */
 export type ErrorCode =
   | 'INVALID_INPUT'
   | 'UNAUTHORIZED'

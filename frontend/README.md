@@ -1,6 +1,6 @@
 # Coupon Lab Frontend
 
-React 정적 SPA(Vite + TypeScript + Tailwind CSS v4)입니다. 구조와 배포 방식은 [ADR-0011](../docs/decisions/ADR-0011-frontend.md), 화면이 기대하는 API는 [프론트엔드 API 계약](../docs/api/FRONTEND_API_CONTRACT.md)을 따릅니다.
+React 정적 SPA(Vite + TypeScript + Tailwind CSS v4)입니다. 화면이 기대하는 API는 [프론트엔드 API 계약](../docs/api/FRONTEND_API_CONTRACT.md)을 따릅니다.
 
 ## 실행
 

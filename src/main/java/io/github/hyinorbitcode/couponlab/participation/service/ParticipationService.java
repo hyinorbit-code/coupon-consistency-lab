@@ -26,7 +26,7 @@ public class ParticipationService {
         }
 
         dropEventApi.checkEntryOpen(dropEventId);
-        
+
         try {
             AssignedPrize prize = prizeCodeAssigner.assign(dropEventId, userId);
             return new EntryResult(drop, prize, true);

@@ -20,7 +20,7 @@ export function createDrop(token: string, request: CreateDropRequest) {
   return apiRequest<AdminDropDetail>('/admin/drops', { method: 'POST', token, body: request })
 }
 
-/** 코드 일괄 등록. 오픈 전(DRAFT·PUBLISHED)에만 가능하다(ADR-0006). */
+/** 코드 일괄 등록. 오픈 전(DRAFT·PUBLISHED)에만 가능하다. */
 export function uploadCodes(token: string, id: number, codes: string[]) {
   return apiRequest<CodeUploadResult>(`/admin/drops/${id}/codes`, { method: 'POST', token, body: { codes } })
 }

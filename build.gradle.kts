@@ -52,7 +52,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// ADR-0004: 무거운 동시성 테스트는 "concurrency" 태그로 분리해 별도 태스크로 실행한다.
+// 무거운 동시성 테스트는 "concurrency" 태그로 분리해 별도 태스크로 실행한다.
 tasks.test {
     useJUnitPlatform {
         excludeTags("concurrency")
