@@ -5,6 +5,7 @@ import io.github.hyinorbitcode.couponlab.drop.PublishedDrop;
 import io.github.hyinorbitcode.couponlab.prizecode.AssignedPrize;
 import io.github.hyinorbitcode.couponlab.prizecode.PrizeCodeAssigner;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,7 +26,14 @@ public class ParticipationService {
         }
 
         dropEventApi.checkEntryOpen(dropEventId);
-        AssignedPrize prize = prizeCodeAssigner.assign(dropEventId, userId);
-        return new EntryResult(drop, prize, true);
+        
+        try {
+            AssignedPrize prize = prizeCodeAssigner.assign(dropEventId, userId);
+            return new EntryResult(drop, prize, true);
+        } catch (DataIntegrityViolationException duplicate) {
+            AssignedPrize existing = prizeCodeAssigner.findAssigned(dropEventId, userId)
+                    .orElseThrow(() -> duplicate);
+            return new EntryResult(drop, existing, false);
+        }
     }
 }
