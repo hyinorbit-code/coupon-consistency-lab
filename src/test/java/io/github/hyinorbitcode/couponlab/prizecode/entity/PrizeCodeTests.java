@@ -57,6 +57,39 @@ class PrizeCodeTests {
                 .isInstanceOf(NullPointerException.class);
     }
 
+    @Test
+    @DisplayName("코드를 사용자에게 할당하면 당첨 상태가 되고 사용자와 시각을 가진다")
+    void assignToUser() {
+        PrizeCode code = PrizeCode.register(DROP_EVENT_ID, CIPHERTEXT, HASH, "0001", NOW);
+        Instant wonAt = NOW.plusSeconds(60);
+
+        code.assignTo(7L, wonAt);
+
+        assertThat(code.isAssigned()).isTrue();
+        assertThat(code.getAssignedUserId()).isEqualTo(7L);
+        assertThat(code.getAssignedAt()).isEqualTo(wonAt);
+    }
+
+    @Test
+    @DisplayName("이미 할당된 코드는 다른 사용자에게 다시 할당할 수 없다")
+    void rejectsAssigningTwice() {
+        PrizeCode code = PrizeCode.register(DROP_EVENT_ID, CIPHERTEXT, HASH, "0001", NOW);
+        code.assignTo(7L, NOW);
+
+        assertThatThrownBy(() -> code.assignTo(8L, NOW))
+                .isInstanceOf(IllegalStateException.class);
+        assertThat(code.getAssignedUserId()).isEqualTo(7L);
+    }
+
+    @Test
+    @DisplayName("할당 시각이 없으면 할당할 수 없다")
+    void rejectsAssigningWithoutTime() {
+        PrizeCode code = PrizeCode.register(DROP_EVENT_ID, CIPHERTEXT, HASH, "0001", NOW);
+
+        assertThatThrownBy(() -> code.assignTo(7L, null))
+                .isInstanceOf(NullPointerException.class);
+    }
+
     @ParameterizedTest(name = "{0} → {1}")
     @CsvSource({
             "COFFEE-0001, 0001",

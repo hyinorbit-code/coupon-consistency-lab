@@ -2,10 +2,10 @@ package io.github.hyinorbitcode.couponlab.drop.service;
 
 import io.github.hyinorbitcode.couponlab.drop.DropEventApi;
 import io.github.hyinorbitcode.couponlab.drop.PrizeCodeCounter;
+import io.github.hyinorbitcode.couponlab.drop.PublishedDrop;
 import io.github.hyinorbitcode.couponlab.drop.entity.DropEvent;
-import io.github.hyinorbitcode.couponlab.drop.exception.CodesLockedException;
-import io.github.hyinorbitcode.couponlab.drop.exception.DropNotFoundException;
-import io.github.hyinorbitcode.couponlab.drop.exception.NoCodesException;
+import io.github.hyinorbitcode.couponlab.drop.entity.DropEventStatus;
+import io.github.hyinorbitcode.couponlab.drop.exception.*;
 import io.github.hyinorbitcode.couponlab.drop.repository.DropEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,6 +58,27 @@ public class DropService implements DropEventApi {
         DropEvent event = getForAdmin(id);
         event.cancel(clock.instant());
         return event;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PublishedDrop getPublishedDrop(long dropEventId) {
+        DropEvent event = getForAdmin(dropEventId);
+        if (event.getStatus() != DropEventStatus.PUBLISHED) {
+            throw new DropNotFoundException();
+        }
+        return new PublishedDrop(event.getId(), event.getTitle(), event.getPrizeDescription());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void checkEntryOpen(long dropEventId) {
+        DropEvent event = getForAdmin(dropEventId);
+        switch (event.phase(clock.instant())) {
+            case UPCOMING -> throw new DropNotOpenException();
+            case CLOSED -> throw new DropClosedException();
+            default -> { }
+        }
     }
 
 }

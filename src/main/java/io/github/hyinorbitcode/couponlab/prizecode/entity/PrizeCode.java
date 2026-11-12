@@ -62,4 +62,12 @@ public class PrizeCode {
     public boolean isAssigned() {
         return assignedUserId != null;
     }
+
+    public void assignTo(long userId, Instant now) {
+        if (isAssigned()) {
+            throw new IllegalStateException("already assigned: " + id);
+        }
+        this.assignedUserId = userId;
+        this.assignedAt = Objects.requireNonNull(now, "now");
+    }
 }
