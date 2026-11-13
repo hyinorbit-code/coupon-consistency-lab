@@ -1,6 +1,7 @@
 package io.github.hyinorbitcode.couponlab.user.service;
 
 import io.github.hyinorbitcode.couponlab.user.Role;
+import io.github.hyinorbitcode.couponlab.user.UserNicknames;
 import io.github.hyinorbitcode.couponlab.user.entity.IdentityProvider;
 import io.github.hyinorbitcode.couponlab.user.entity.User;
 import io.github.hyinorbitcode.couponlab.user.entity.UserIdentity;
@@ -10,15 +11,19 @@ import io.github.hyinorbitcode.couponlab.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserNicknames {
 
     private final UserRepository userRepository;
     private final UserIdentityRepository userIdentityRepository;
@@ -54,4 +59,13 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, String> findNicknames(Collection<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return Map.of();
+        }
+        return userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getId, User::getNickname));
+    }
 }

@@ -93,16 +93,18 @@
 
 | 메서드 | 경로 | 요청 | 응답 | 상태 |
 | --- | --- | --- | --- | --- |
-| GET | `/admin/drops` | – | `AdminDropSummary[]` | 목업 |
-| GET | `/admin/drops/{id}` | – | `AdminDropDetail` | **보완 필요**: `registeredCodes`, `assignedCodes`, `entryAttempts`, `winners` 없음 |
-| POST | `/admin/drops` | `{title, prizeDescription, openAt, closeAt}` | 201 `AdminDropDetail` (DRAFT) | **보완 필요**: 응답 필드는 위와 같음 |
+| GET | `/admin/drops` | – | `AdminDropSummary[]` (모든 상태, 오픈 시각 내림차순) | 구현 |
+| GET | `/admin/drops/{id}` | – | `AdminDropDetail` | 구현 |
+| POST | `/admin/drops` | `{title, prizeDescription, openAt, closeAt}` | 201 `AdminDropDetail` (DRAFT) | 구현 |
 | POST | `/admin/drops/{id}/codes` | `{codes: string[]}` | 200 `{registered, duplicates}` | 구현 |
-| POST | `/admin/drops/{id}/publish` | – | 200 `AdminDropDetail` | **보완 필요**: 응답 필드는 위와 같음 |
-| POST | `/admin/drops/{id}/cancel` | – | 200 `AdminDropDetail` | **보완 필요**: 응답 필드는 위와 같음 |
+| POST | `/admin/drops/{id}/publish` | – | 200 `AdminDropDetail` | 구현 |
+| POST | `/admin/drops/{id}/cancel` | – | 200 `AdminDropDetail` | 구현 |
+| GET | `/admin/drops/{id}/reconciliation` | – | 200 `Reconciliation` | 구현 (기본 대사) |
 
 - `AdminDropSummary = {id, title, status, phase, openAt, closeAt, registeredCodes, assignedCodes}`
 - `AdminDropDetail = AdminDropSummary + {prizeDescription, entryAttempts, winners: [{nickname, codeHint, assignedAt}]}`
-- `entryAttempts`는 매진 응답을 포함한 참여 시도 수로, DB가 아니라 메트릭에서 온다.
+- `entryAttempts`는 매진 응답을 포함한 참여 시도 수로, DB가 아니라 메트릭에서 온다. 애플리케이션 메모리에 있어 재시작하면 0부터 다시 센다.
+- `Reconciliation = {dropId, consistent, registeredCodes, assignedCodes, distinctWinners, incompleteAssignments, assignedOutsidePeriod, assignedWithinRegistered, oneWinPerUser, assignmentsComplete, assignedWithinPeriod}`. 불변식(할당 ≤ 등록, 한 사람 한 번, 사용자·할당 시각이 함께 존재, 기간 안 할당)을 DB 집계로 확인한다.
 - `codeHint`는 코드 끝 4자리. 관리자 화면에도 원문은 보내지 않는다.
 
 ## 목업에서 정한 화면 규칙(백엔드와 맞춰야 할 것)

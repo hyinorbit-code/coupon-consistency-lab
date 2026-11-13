@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface PrizeCodeRepository extends JpaRepository<PrizeCode, Long> {
@@ -33,4 +35,32 @@ public interface PrizeCodeRepository extends JpaRepository<PrizeCode, Long> {
             for update skip locked
             """, nativeQuery = true)
     Optional<PrizeCode> findFirstAvailableForUpdateSkipLocked(@Param("dropEventId") long dropEventId);
+
+    long countByDropEventIdAndAssignedUserIdIsNotNull(long dropEventId);
+
+    List<PrizeCode> findByDropEventIdAndAssignedUserIdIsNotNullOrderByAssignedAtAscIdAsc(long dropEventId);
+
+    @Query("""
+            select count(distinct p.assignedUserId) from PrizeCode p
+            where p.dropEventId = :dropEventId and p.assignedUserId is not null
+            """)
+    long countDistinctWinners(@Param("dropEventId") long dropEventId);
+
+    @Query("""
+            select count(p) from PrizeCode p
+            where p.dropEventId = :dropEventId
+              and ((p.assignedUserId is null and p.assignedAt is not null)
+                or (p.assignedUserId is not null and p.assignedAt is null))
+            """)
+    long countIncompleteAssignments(@Param("dropEventId") long dropEventId);
+
+    @Query("""
+            select count(p) from PrizeCode p
+            where p.dropEventId = :dropEventId
+              and p.assignedAt is not null
+              and (p.assignedAt < :openAt or p.assignedAt >= :closeAt)
+            """)
+    long countAssignedOutside(@Param("dropEventId") long dropEventId,
+                              @Param("openAt") Instant openAt,
+                              @Param("closeAt") Instant closeAt);
 }

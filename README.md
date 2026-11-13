@@ -174,7 +174,7 @@ io.github.hyinorbitcode.couponlab
 
 ## 테스트
 
-- 단위·통합 테스트가 199개 있습니다. 엔티티 규칙, API 응답, 권한, 오류 코드, 아키텍처 규칙까지 봅니다. 통합 테스트는 Testcontainers로 실제 MySQL을 띄워서 돌립니다. H2 같은 걸 쓰면 이번 데드락처럼 MySQL에서만 생기는 문제를 놓칠 수 있어서입니다.
+- 단위·통합 테스트가 206개 있습니다. 엔티티 규칙, API 응답, 권한, 오류 코드, 아키텍처 규칙까지 봅니다. 통합 테스트는 Testcontainers로 실제 MySQL을 띄워서 돌립니다. H2 같은 걸 쓰면 이번 데드락처럼 MySQL에서만 생기는 문제를 놓칠 수 있어서입니다.
 - 동시성 테스트는 `@Tag("concurrency")`로 따로 빼서 `concurrencyTest`로 돌립니다. 스레드를 `CountDownLatch`로 한꺼번에 출발시키고, 위의 불변식이 지켜졌는지 확인합니다.
 - `EntryStressTests`는 `STRESS=true`일 때만 돌아가는 측정용 테스트입니다. 1,000~5,000건 시나리오에서 처리량, 지연, 데드락, 정확성을 출력합니다.
 

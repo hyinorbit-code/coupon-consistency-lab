@@ -64,10 +64,11 @@ public class PrizeCode {
     }
 
     public void assignTo(long userId, Instant now) {
+        Objects.requireNonNull(now, "now");
         if (isAssigned()) {
             throw new IllegalStateException("already assigned: " + id);
         }
         this.assignedUserId = userId;
-        this.assignedAt = Objects.requireNonNull(now, "now");
+        this.assignedAt = now;
     }
 }

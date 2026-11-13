@@ -1,5 +1,7 @@
 package io.github.hyinorbitcode.couponlab.drop;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,4 +18,10 @@ public interface PrizeCodeQuery {
 
     /** 사용자가 이 이벤트에서 받은 경품 코드 ID. 당첨되지 않았으면 비어 있다. */
     Optional<Long> findPrizeIdOf(long dropEventId, long userId);
+
+    /** 당첨자 목록. 할당 시각 순이다. */
+    List<DropWinner> findWinners(long dropEventId);
+
+    /** 기본 대사용 집계. 기간 밖 할당은 [openAt, closeAt) 기준이다. */
+    CodeAssignmentStats statsOf(long dropEventId, Instant openAt, Instant closeAt);
 }

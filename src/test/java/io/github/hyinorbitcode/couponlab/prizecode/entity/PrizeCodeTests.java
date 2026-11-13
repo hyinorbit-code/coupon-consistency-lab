@@ -88,6 +88,8 @@ class PrizeCodeTests {
 
         assertThatThrownBy(() -> code.assignTo(7L, null))
                 .isInstanceOf(NullPointerException.class);
+        assertThat(code.isAssigned()).as("실패한 할당은 상태를 바꾸지 않는다").isFalse();
+        assertThat(code.getAssignedAt()).isNull();
     }
 
     @ParameterizedTest(name = "{0} → {1}")
