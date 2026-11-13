@@ -1,7 +1,7 @@
 package io.github.hyinorbitcode.couponlab.drop.service;
 
 import io.github.hyinorbitcode.couponlab.drop.DropEventApi;
-import io.github.hyinorbitcode.couponlab.drop.PrizeCodeCounter;
+import io.github.hyinorbitcode.couponlab.drop.PrizeCodeQuery;
 import io.github.hyinorbitcode.couponlab.drop.PublishedDrop;
 import io.github.hyinorbitcode.couponlab.drop.entity.DropEvent;
 import io.github.hyinorbitcode.couponlab.drop.entity.DropEventStatus;
@@ -13,13 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class DropService implements DropEventApi {
 
     private final DropEventRepository dropEventRepository;
-    private final PrizeCodeCounter prizeCodeCounter;
+    private final PrizeCodeQuery prizeCodeQuery;
     private final Clock clock;
 
     @Transactional
@@ -46,7 +48,7 @@ public class DropService implements DropEventApi {
     @Transactional
     public DropEvent publish(long id) {
         DropEvent event = getForAdmin(id);
-        if (prizeCodeCounter.countByDropEventId(id) == 0) {
+        if (prizeCodeQuery.countByDropEventId(id) == 0) {
             throw new NoCodesException();
         }
         event.publish(clock.instant());
@@ -63,10 +65,7 @@ public class DropService implements DropEventApi {
     @Override
     @Transactional(readOnly = true)
     public PublishedDrop getPublishedDrop(long dropEventId) {
-        DropEvent event = getForAdmin(dropEventId);
-        if (event.getStatus() != DropEventStatus.PUBLISHED) {
-            throw new DropNotFoundException();
-        }
+        DropEvent event = findPublished(dropEventId);
         return new PublishedDrop(event.getId(), event.getTitle(), event.getPrizeDescription());
     }
 
@@ -79,6 +78,40 @@ public class DropService implements DropEventApi {
             case CLOSED -> throw new DropClosedException();
             default -> { }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<DropView> listPublished() {
+        Instant now = clock.instant();
+        return dropEventRepository.findByStatusOrderByOpenAtAscIdAsc(DropEventStatus.PUBLISHED).stream()
+                .map(event -> toView(event, now, null))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public DropView getPublished(long id, Optional<Long> userId) {
+        DropEvent event = findPublished(id);
+        Long myPrizeId = userId.flatMap(uid -> prizeCodeQuery.findPrizeIdOf(id, uid)).orElse(null);
+        return toView(event, clock.instant(), myPrizeId);
+    }
+
+    @Transactional(readOnly = true)
+    public DropView getStock(long id) {
+        return toView(findPublished(id), clock.instant(), null);
+    }
+
+    private DropEvent findPublished(long id) {
+        DropEvent event = getForAdmin(id);
+        if (event.getStatus() != DropEventStatus.PUBLISHED) {
+            throw new DropNotFoundException();
+        }
+        return event;
+    }
+
+    private DropView toView(DropEvent event, Instant now, Long myPrizeId) {
+        long total = prizeCodeQuery.countByDropEventId(event.getId());
+        long remaining = prizeCodeQuery.countRemainingByDropEventId(event.getId());
+        return new DropView(event, total, remaining, event.phase(now, remaining), myPrizeId);
     }
 
 }

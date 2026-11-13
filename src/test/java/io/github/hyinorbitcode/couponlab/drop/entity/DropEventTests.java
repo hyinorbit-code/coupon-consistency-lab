@@ -264,6 +264,25 @@ class DropEventTests {
         assertThat(event.getStatus()).isEqualTo(DropEventStatus.PUBLISHED);
     }
 
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("phaseWithStock")
+    @DisplayName("진행 중에 남은 코드가 없으면 매진, 오픈 전과 종료 후는 수량과 상관없이 시각으로 정한다")
+    void phaseConsidersRemainingCodes(String description, Instant now, long remaining, DropPhase expected) {
+        DropEvent event = draft();
+
+        assertThat(event.phase(now, remaining)).isEqualTo(expected);
+    }
+
+    static Stream<Arguments> phaseWithStock() {
+        return Stream.of(
+                Arguments.of("진행 중, 코드 남음 → 진행 중", OPEN_AT, 3L, DropPhase.OPEN),
+                Arguments.of("진행 중, 코드 0개 → 매진", OPEN_AT, 0L, DropPhase.SOLD_OUT),
+                Arguments.of("오픈 전, 코드 0개 → 오픈 전", OPEN_AT.minusNanos(1), 0L, DropPhase.UPCOMING),
+                Arguments.of("종료 후, 코드 남음 → 종료", CLOSE_AT, 3L, DropPhase.CLOSED),
+                Arguments.of("종료 후, 코드 0개 → 종료", CLOSE_AT, 0L, DropPhase.CLOSED)
+        );
+    }
+
     private static DropEvent draft() {
         return DropEvent.create("커피 드롭", "아메리카노 쿠폰", OPEN_AT, CLOSE_AT, NOW);
     }

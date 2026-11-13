@@ -83,6 +83,15 @@ public class DropEvent {
         return DropPhase.CLOSED;
     }
 
+    /** 진행 중인데 남은 코드가 없으면 매진이다. 오픈 전과 종료 후는 시각만으로 정한다. */
+    public DropPhase phase(Instant now, long remainingCodes) {
+        DropPhase byTime = phase(now);
+        if (byTime == DropPhase.OPEN && remainingCodes <= 0) {
+            return DropPhase.SOLD_OUT;
+        }
+        return byTime;
+    }
+
     public boolean canRegisterCodes(Instant now) {
         return status != DropEventStatus.CANCELED && now.isBefore(openAt);
     }

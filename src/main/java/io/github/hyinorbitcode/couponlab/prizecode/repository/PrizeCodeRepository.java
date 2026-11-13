@@ -15,6 +15,8 @@ public interface PrizeCodeRepository extends JpaRepository<PrizeCode, Long> {
 
     long countByDropEventId(long dropEventId);
 
+    long countByDropEventIdAndAssignedUserIdIsNull(long dropEventId);
+
     Optional<PrizeCode> findByDropEventIdAndAssignedUserId(long dropEventId, long assignedUserId);
 
     Optional<PrizeCode> findFirstByDropEventIdAndAssignedUserIdIsNullOrderByIdAsc(long dropEventId);

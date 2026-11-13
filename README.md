@@ -129,7 +129,7 @@ Redis나 Kafka도 처음부터 넣지 않았습니다. 써 보고 싶은 마음�
 그런데 공개 기능을 만들면서 "코드가 0개면 공개를 막자"는 규칙을 넣으려니, 이번엔 `drop`이 코드 개수를 알아야 했습니다.
 
 `drop`이 `prizecode`를 그냥 불러 버리면 서로를 참조하는 순환이 생기고, Spring Modulith 검증 테스트가 바로 실패합니다. 
-그래서 `drop` 쪽에 `PrizeCodeCounter`라는 인터페이스를 만들어 두고, 구현은 `prizecode`가 하게 했습니다. 이렇게 하면 `drop`은 인터페이스만 알고, 참조 방향은 여전히 `prizecode → drop` 한쪽입니다.
+그래서 `drop` 쪽에 `PrizeCodeQuery`라는 인터페이스를 만들어 두고, 구현은 `prizecode`가 하게 했습니다. 이렇게 하면 `drop`은 인터페이스만 알고, 참조 방향은 여전히 `prizecode → drop` 한쪽입니다.
 
 ### 경품 코드 암호화 저장
 
@@ -174,7 +174,7 @@ io.github.hyinorbitcode.couponlab
 
 ## 테스트
 
-- 단위·통합 테스트가 185개 있습니다. 엔티티 규칙, API 응답, 권한, 오류 코드, 아키텍처 규칙까지 봅니다. 통합 테스트는 Testcontainers로 실제 MySQL을 띄워서 돌립니다. H2 같은 걸 쓰면 이번 데드락처럼 MySQL에서만 생기는 문제를 놓칠 수 있어서입니다.
+- 단위·통합 테스트가 199개 있습니다. 엔티티 규칙, API 응답, 권한, 오류 코드, 아키텍처 규칙까지 봅니다. 통합 테스트는 Testcontainers로 실제 MySQL을 띄워서 돌립니다. H2 같은 걸 쓰면 이번 데드락처럼 MySQL에서만 생기는 문제를 놓칠 수 있어서입니다.
 - 동시성 테스트는 `@Tag("concurrency")`로 따로 빼서 `concurrencyTest`로 돌립니다. 스레드를 `CountDownLatch`로 한꺼번에 출발시키고, 위의 불변식이 지켜졌는지 확인합니다.
 - `EntryStressTests`는 `STRESS=true`일 때만 돌아가는 측정용 테스트입니다. 1,000~5,000건 시나리오에서 처리량, 지연, 데드락, 정확성을 출력합니다.
 

@@ -56,15 +56,15 @@
 
 상태: **구현** = 실제 백엔드, **목업** = MSW만 있음, **보완 필요** = 백엔드에 있지만 계약과 다름.
 
-> 2026-11-02: 백엔드 로직을 지우고 다시 구현하는 중이라, 아래 **구현** 표시는 `reference/v0` 브랜치 기준입니다. 다시 구현하면 이 표시를 갱신합니다.
+> 2026-11-13 기준 `main` 브랜치의 백엔드 상태입니다. 2026-11-02에 백엔드를 다시 구현하기 시작해서, 이전 `reference/v0` 브랜치에만 있던 기능은 **재구현 전**으로 표시합니다.
 
 ### 인증·계정
 
 | 메서드 | 경로 | 요청 | 응답 | 상태 |
 | --- | --- | --- | --- | --- |
-| POST | `/auth/signup` | `{email, password, nickname}` | 202 `{message}` | 구현 |
-| POST | `/auth/verify-email` | `{token}` | 200 `{message}` | 구현 |
-| POST | `/auth/verify-email/resend` | `{email}` | 202 `{message}` | 구현 |
+| POST | `/auth/signup` | `{email, password, nickname}` | 202 `{message}` | 재구현 전 |
+| POST | `/auth/verify-email` | `{token}` | 200 `{message}` | 재구현 전 |
+| POST | `/auth/verify-email/resend` | `{email}` | 202 `{message}` | 재구현 전 |
 | POST | `/auth/login` | `{email, password}` | 200 `{accessToken, expiresAt}` | 목업 (사용자 기능 2번) |
 | POST | `/auth/logout` | – | 204 | 목업 (사용자 기능 3번) |
 | POST | `/auth/kakao/login` | `{code}` | 200 `{accessToken, expiresAt}` | 목업 (사용자 기능 4번) |
@@ -79,10 +79,10 @@
 
 | 메서드 | 경로 | 응답 | 상태 |
 | --- | --- | --- | --- |
-| GET | `/drops` | `DropSummary[]` (공개된 이벤트만) | 목업 |
-| GET | `/drops/{id}` | `DropDetail` (로그인 시 `myPrizeId` 포함) | 목업 |
-| GET | `/drops/{id}/stock` | `{remainingQuantity, phase}` | 목업. 화면이 2초마다 폴링하며 4단계 캐시 대상 |
-| POST | `/drops/{id}/entries` | 201 `{result: "WON", prize}`. 이미 당첨이면 200으로 같은 경품(멱등) | 목업 (1단계 핵심) |
+| GET | `/drops` | `DropSummary[]` (공개된 이벤트만, 로그인 불필요) | 구현 |
+| GET | `/drops/{id}` | `DropDetail` (로그인 시 `myPrizeId` 포함, 로그인 불필요) | 구현 |
+| GET | `/drops/{id}/stock` | `{remainingQuantity, phase}` | 구현 (로그인 불필요). 화면이 2초마다 폴링하며 4단계 캐시 대상 |
+| POST | `/drops/{id}/entries` | 201 `{result: "WON", prize}`. 이미 당첨이면 200으로 같은 경품(멱등) | 구현. 카카오 미연동 403은 실전 이벤트 단계에서 추가 |
 
 - `DropSummary = {id, title, prizeDescription, openAt, closeAt, totalQuantity, remainingQuantity, phase}`
 - `phase`: `UPCOMING`(오픈 전) · `OPEN` · `SOLD_OUT` · `CLOSED`. 서버가 DB 시각과 남은 수량으로 계산한다.
@@ -94,11 +94,11 @@
 | 메서드 | 경로 | 요청 | 응답 | 상태 |
 | --- | --- | --- | --- | --- |
 | GET | `/admin/drops` | – | `AdminDropSummary[]` | 목업 |
-| GET | `/admin/drops/{id}` | – | `AdminDropDetail` | 목업 |
-| POST | `/admin/drops` | `{title, prizeDescription, openAt, closeAt}` | 201 `AdminDropDetail` (DRAFT) | 목업 |
-| POST | `/admin/drops/{id}/codes` | `{codes: string[]}` | 200 `{registered, duplicates}` | 목업 |
-| POST | `/admin/drops/{id}/publish` | – | 200 `AdminDropDetail` | 목업 |
-| POST | `/admin/drops/{id}/cancel` | – | 200 `AdminDropDetail` | 목업 |
+| GET | `/admin/drops/{id}` | – | `AdminDropDetail` | **보완 필요**: `registeredCodes`, `assignedCodes`, `entryAttempts`, `winners` 없음 |
+| POST | `/admin/drops` | `{title, prizeDescription, openAt, closeAt}` | 201 `AdminDropDetail` (DRAFT) | **보완 필요**: 응답 필드는 위와 같음 |
+| POST | `/admin/drops/{id}/codes` | `{codes: string[]}` | 200 `{registered, duplicates}` | 구현 |
+| POST | `/admin/drops/{id}/publish` | – | 200 `AdminDropDetail` | **보완 필요**: 응답 필드는 위와 같음 |
+| POST | `/admin/drops/{id}/cancel` | – | 200 `AdminDropDetail` | **보완 필요**: 응답 필드는 위와 같음 |
 
 - `AdminDropSummary = {id, title, status, phase, openAt, closeAt, registeredCodes, assignedCodes}`
 - `AdminDropDetail = AdminDropSummary + {prizeDescription, entryAttempts, winners: [{nickname, codeHint, assignedAt}]}`
